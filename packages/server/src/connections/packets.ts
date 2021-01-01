@@ -7,17 +7,26 @@ import chalk from "chalk";
 import ServerboundLoginStart from "./packets/serverbound/login/LoginStart";
 
 export enum ServerboundPackets {
-    SListHandshake,
-    SListRequest = 0,
-    LoginStart = 0,
+    SListHandshake = 0x00,
+    SListRequest = 0x00,
+    LoginStart = 0x00,
     SListPing,
-    EncryptionResponse = 1,
-    LoginPlugiNResponse,
+    EncryptionResponse = 0x01,
+    LoginPluginResponse,
 }
 
 export enum ClientboundPackets {
-    SListResponse,
+    SListResponse = 0x00,
+    Disconnect = 0x00,
     SListPong,
+    EncryptionRequest = 0x01,
+    LoginSuccess,
+
+    JoinGame = 0x24,
+
+    PlayerInfo = 0x32,
+
+    PositionAndLook = 0x34,
 }
 
 export default function decidePacket(
@@ -30,10 +39,14 @@ export default function decidePacket(
     const id = decode(buf.slice(1));
 
     let p: Packet | null = null;
+    let pname: string | null = null;
+
+    console.log(conn.slist);
 
     if (
-        id === ServerboundPackets.SListHandshake ||
-        id === ServerboundPackets.SListRequest
+        (id === ServerboundPackets.SListHandshake ||
+            id === ServerboundPackets.SListRequest) &&
+        conn.status !== 2
     ) {
         if (length > 1) {
             p = new ServerboundSListHandshake();
@@ -41,6 +54,7 @@ export default function decidePacket(
             p = new ServerboundSListRequest();
         }
     } else if (id === ServerboundPackets.SListPing && conn.slist) {
+        pname = "ServerboundSListPing";
         conn.sendPacket(ClientboundPackets.SListPong, buf.slice(2));
     } else if (id === ServerboundPackets.LoginStart && !conn.slist) {
         p = new ServerboundLoginStart();
@@ -54,13 +68,13 @@ export default function decidePacket(
     }
 
     if (conn.server.options.protocol?.debug) {
-        if (id in ServerboundPackets) {
-            console.log(
-                chalk`{cyan.bold FOUND PACKET} {gray ${ServerboundPackets[id]}}`,
-            );
-        } else {
-            console.log(chalk`{red FOUND UNKNOWN PACKET OF ID} ${id}`);
+        let name = "... was not found";
+        if (p) {
+            name = p.constructor.name;
+        } else if (pname) {
+            name = pname;
         }
+        console.log(chalk`{cyan.bold FOUND PACKET} {gray ${name}}`);
     }
 
     return p;

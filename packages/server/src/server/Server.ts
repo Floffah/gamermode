@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 import { AddressInfo, createServer, Server as NetServer, Socket } from "net";
 import Connection from "../connections/Connection";
 import PlayerStore from "../structure/PlayerStore";
+import { generateKeyPairSync, KeyPairSyncResult } from "crypto";
 
 declare interface Server {
     on(event: "listening", listener: (port: number) => void): this;
@@ -19,6 +20,8 @@ class Server extends EventEmitter {
 
     players: PlayerStore;
 
+    keys: KeyPairSyncResult<Buffer, Buffer>;
+
     constructor(options: ServerOptions) {
         super();
         this.options = options;
@@ -27,6 +30,18 @@ class Server extends EventEmitter {
     start() {
         this.server = createServer({
             allowHalfOpen: true,
+        });
+
+        this.keys = generateKeyPairSync("rsa", {
+            modulusLength: 1024,
+            publicKeyEncoding: {
+                format: "der",
+                type: "pkcs1",
+            },
+            privateKeyEncoding: {
+                format: "der",
+                type: "pkcs1",
+            },
         });
 
         this.server.on("listening", () => this.listening());
@@ -74,6 +89,9 @@ interface ServerOptions {
     };
     protocol?: {
         debug?: boolean;
+    };
+    encryption?: {
+        tokenSize?: number; // only tested with 4
     };
 }
 

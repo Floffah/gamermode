@@ -1,0 +1,19 @@
+{
+  "name": "@gamermode/nbt",
+  "version": "0.0.1",
+  "license": "GPL-3.0",
+  "private": false,
+  "description": "Implementation of the NBT format for the GamerMode server software.",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "dependencies": {
+    "pako": "^2.0.2",
+    "source-map-support": "^0.5.19",
+    "varint": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.17",
+    "@types/pako": "^1.0.1",
+    "@types/varint": "^5.0.0"
+  }
+}

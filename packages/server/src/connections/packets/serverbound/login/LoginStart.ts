@@ -1,5 +1,4 @@
 import Packet from "../../../Packet";
-import { decode } from "varint";
 
 export default class ServerboundLoginStart extends Packet {
     constructor() {
@@ -7,7 +6,14 @@ export default class ServerboundLoginStart extends Packet {
     }
 
     run() {
-        const ulen = decode(this.buf.slice(3));
-        console.log(this.buf.slice(4, ulen));
+        if (
+            !this.conn.encrypted &&
+            this.conn.addrUsed !== "localhost" &&
+            this.conn.addrUsed !== "127.0.0.1"
+        ) {
+            this.conn.requestEncryption();
+        } else {
+            this.conn.sendLoginSuccess(this.buf);
+        }
     }
 }

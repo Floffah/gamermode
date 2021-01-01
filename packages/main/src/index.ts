@@ -8,7 +8,7 @@ const s = new Server({
     },
     players: {
         max: 50,
-        showPlayers: false,
+        showPlayers: true,
     },
     protocol: {
         debug: true,
