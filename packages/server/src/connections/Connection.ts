@@ -9,12 +9,7 @@ import axios from "axios";
 import { parse } from "uuid";
 import Player from "../structure/Player";
 import { getAllWithValue } from "../utils/enums";
-import {
-    numToByteBuf,
-    numToIntBuf,
-    numToLongBuf,
-    numToUByteBuf,
-} from "../utils/numbers";
+import { numToByte, numToInt, numToLong, numToUByte } from "../utils/numbers";
 import { stringArrayToBuf, stringToBuf } from "../utils/strings";
 
 export default class Connection {
@@ -244,10 +239,10 @@ export default class Connection {
         this.sendPacket(
             ClientboundPackets.JoinGame,
             Buffer.of(
-                ...numToIntBuf(1),
+                ...numToInt(1),
                 0x00,
-                ...numToUByteBuf(0),
-                ...numToByteBuf(-1),
+                ...numToUByte(0),
+                ...numToByte(-1),
                 ...encode(1),
                 ...stringArrayToBuf(["minecraft:world"]),
                 ...encode(dimcodec.byteLength),
@@ -255,7 +250,7 @@ export default class Connection {
                 ...encode(dim.byteLength),
                 ...dim,
                 ...stringToBuf("minecraft:world"),
-                ...numToLongBuf(78953265823),
+                ...numToLong(78953265823),
                 ...encode(50),
                 ...encode(8),
                 0x00,
