@@ -15,8 +15,8 @@ public class SocketManager {
     public Server server;
     Thread lthread;
 
-    Map<UUID, SocketConnection> verified = new HashMap<>();
-    List<SocketConnection> newconns = new LinkedList<>();
+    public Map<UUID, SocketConnection> verified = new HashMap<>();
+    public List<SocketConnection> newconns = new LinkedList<>();
 
     public SocketManager(Server server) {
         this.server = server;

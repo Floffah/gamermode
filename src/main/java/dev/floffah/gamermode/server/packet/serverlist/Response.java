@@ -9,6 +9,7 @@ import dev.floffah.gamermode.util.Strings;
 import java.io.IOException;
 
 public class Response extends BasePacket {
+
     public Response() {
         super("ServerListResponse", 0x00, PacketType.OUTBOUND);
     }
@@ -17,14 +18,19 @@ public class Response extends BasePacket {
     public ByteArrayDataOutput buildOutput() throws IOException {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        Strings.writeUTF("""
+        String motd = "Minecraft Server";
+        if(conn.protver < conn.main.server.protver) {
+            motd = "§cClient version out of date";
+        }
+
+        Strings.writeUTF(String.format("""
                 {
                     "version": {
                         "name": "GamerMode 1.16.5",
-                        "protocol": 754
+                        "protocol": %s
                     },
                     "players": {
-                        "max": 20,
+                        "max": %s,
                         "online": 5,
                         "sample": [
                             {
@@ -34,9 +40,9 @@ public class Response extends BasePacket {
                         ]
                     },
                     "description": {
-                        "text": "Mineraft Server"
+                        "text": "%s"
                     }
-                }""", out);
+                }""", conn.main.server.protver, conn.main.server.conf.players.max, motd), out);
 
         return out;
     }

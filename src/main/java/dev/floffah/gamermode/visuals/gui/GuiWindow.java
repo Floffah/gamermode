@@ -24,7 +24,11 @@ public class GuiWindow {
     public static GuiWindow start(Server main) {
         boolean isDoubleClick = check();
         if ((isDoubleClick || (main.args.contains("-gui")) && !main.args.contains("-nogui"))) {
-            return create(main);
+            try {
+                return create(main);
+            } catch (IOException e) {
+                main.logger.printStackTrace(e);
+            }
         }
         return null;
     }
@@ -34,13 +38,13 @@ public class GuiWindow {
         return console == null;
     }
 
-    public static GuiWindow create(Server main) {
+    public static GuiWindow create(Server main) throws IOException {
         GuiWindow win = new GuiWindow(main);
         win.startOutput();
         return win;
     }
 
-    public void startOutput() {
+    public void startOutput() throws IOException {
         frame = new JFrame("GamerMode Output");
 
         text = new JTextArea();
@@ -76,7 +80,11 @@ public class GuiWindow {
         frame.setMinimumSize(new Dimension(700, 500));
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                main.shutDown();
+                try {
+                    main.shutDown();
+                } catch (IOException ioException) {
+                    main.logger.printStackTrace(ioException);
+                }
             }
         });
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
