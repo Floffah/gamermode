@@ -10,6 +10,7 @@ import org.awaitility.core.ConditionTimeoutException;
 
 import java.io.*;
 import java.net.Socket;
+import java.security.KeyPair;
 import java.util.Arrays;
 
 import static org.awaitility.Awaitility.await;
@@ -22,6 +23,11 @@ public class SocketConnection {
     public int protver;
     public String addrused;
     public int portused;
+    public String playername;
+    public byte[] verifytoken = null;
+    public boolean encrypted = false;
+    public KeyPair kp;
+    public byte[] ssecret;
     DataInputStream in;
     Socket sock;
     DataOutputStream out;
@@ -55,6 +61,7 @@ public class SocketConnection {
 
     public void checkClosed() {
         for (; ; ) {
+            boolean closed = false;
             try {
                 await().until(() -> lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed());
             } catch (ConditionTimeoutException e) {
@@ -63,22 +70,22 @@ public class SocketConnection {
             while (lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed()) {
                 try {
                     close();
+                    closed = true;
                     break;
                 } catch (IOException e) {
                     main.server.logger.printStackTrace(e);
                 }
             }
+            if(closed) break;
         }
     }
 
     public void close() throws IOException {
         main.server.logger.info("Closing connection");
-        closer.interrupt();
-        packetreader.interrupt();
-        closer = null;
+        if(packetreader != null) packetreader.interrupt();
         packetreader = null;
-        in.close();
-        out.close();
+        if(in != null) in.close();
+        if(out != null) out.close();
         in = null;
         out = null;
         if (!sock.isClosed()) {
@@ -87,7 +94,8 @@ public class SocketConnection {
         if (!verified) {
             main.newconns.remove(this);
         }
-        main.server.logger.info("Closed connection");
+        if(closer != null) closer.interrupt();
+        closer = null;
     }
 
     public void send(ByteArrayDataOutput out) throws IOException {
@@ -101,8 +109,8 @@ public class SocketConnection {
     public void send(BasePacket p) throws IOException {
         p.conn = this;
         ByteArrayDataOutput dat = p.buildOutput();
-        main.server.logger.info(String.format("Sending packet of name %s and id %s", p.name, p.id));
         if (dat != null) {
+            main.server.logger.info(String.format("Sending packet of name %s and id %s", p.name, p.id), Arrays.toString(dat.toByteArray()));
             VarInt.writeVarInt(out, dat.toByteArray().length + 1);
             VarInt.writeVarInt(out, p.id);
             for (byte d : dat.toByteArray()) {
@@ -114,12 +122,15 @@ public class SocketConnection {
 
     public void readPackets() throws IOException, InterruptedException {
         for (; ; ) {
+            if(in == null || out == null) {
+                break;
+            }
             try {
                 await().until(() -> in.available() > 0);
             } catch (ConditionTimeoutException e) {
                 continue;
             }
-            while (in.available() > 0) {
+            while (in != null && in.available() > 0) {
                 int len = VarInt.readVarInt(in);
                 int id = VarInt.readVarInt(in);
                 byte[] data = new byte[len];

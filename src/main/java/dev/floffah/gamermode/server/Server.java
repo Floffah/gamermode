@@ -1,7 +1,5 @@
 package dev.floffah.gamermode.server;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import dev.floffah.gamermode.config.Config;
@@ -11,14 +9,17 @@ import dev.floffah.gamermode.server.socket.SocketConnection;
 import dev.floffah.gamermode.server.socket.SocketManager;
 import dev.floffah.gamermode.visuals.Logger;
 import dev.floffah.gamermode.visuals.gui.GuiWindow;
-import org.checkerframework.checker.units.qual.C;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -34,6 +35,7 @@ public class Server {
     public ObjectMapper om;
     public Config conf;
     public int protver = 754;
+    public KeyPairGenerator kpg;
 
     SocketManager sock;
 
@@ -55,14 +57,20 @@ public class Server {
             }
             logger.info(parent);
             File confile = Path.of(parent, "config.yml").toFile();
-            if(!confile.exists()) {
+            if (!confile.exists()) {
                 conf = new Config();
                 setDefaultConfig();
                 om.writeValue(confile, conf);
             }
             conf = om.readValue(confile, Config.class);
         } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
+            logger.printStackTrace(e);
+        }
+
+        try {
+            kpg = KeyPairGenerator.getInstance("RSA");
+        } catch (NoSuchAlgorithmException e) {
+            logger.printStackTrace(e);
         }
 
         logger.info("Starting socket...");

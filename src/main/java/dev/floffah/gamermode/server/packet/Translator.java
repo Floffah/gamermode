@@ -1,6 +1,8 @@
 package dev.floffah.gamermode.server.packet;
 
 import com.google.common.io.ByteArrayDataInput;
+import dev.floffah.gamermode.server.packet.login.EncryptionResponse;
+import dev.floffah.gamermode.server.packet.login.LoginStart;
 import dev.floffah.gamermode.server.packet.serverlist.Handshake;
 import dev.floffah.gamermode.server.packet.serverlist.Ping;
 import dev.floffah.gamermode.server.packet.serverlist.Request;
@@ -31,6 +33,12 @@ public class Translator {
                 b = new Request();
             } else if(id == 0x01) {
                 b = new Ping();
+            }
+        } else if(conn.state == ConnectionState.LOGIN) {
+            if(id == 0x00) {
+                b = new LoginStart();
+            } else if(id == 0x01) {
+                b = new EncryptionResponse();
             }
         }
         b.conn = conn;
