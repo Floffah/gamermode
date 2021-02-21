@@ -5,9 +5,13 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.Translator;
+import dev.floffah.gamermode.util.Bytes;
 import dev.floffah.gamermode.util.VarInt;
 import org.awaitility.core.ConditionTimeoutException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.*;
 import java.net.Socket;
 import java.security.KeyPair;
@@ -28,12 +32,15 @@ public class SocketConnection {
     public boolean encrypted = false;
     public KeyPair kp;
     public byte[] ssecret;
+    public Cipher decryptc;
+    public Cipher encryptc;
     DataInputStream in;
     Socket sock;
     DataOutputStream out;
-    Thread closer;
-    Thread packetreader;
     long lastpacket = System.currentTimeMillis();
+
+    boolean stopcloser = false;
+    boolean stopreader = false;
 
     public SocketConnection(SocketManager main, Socket sock) throws IOException {
         this.main = main;
@@ -45,8 +52,7 @@ public class SocketConnection {
 
         Runnable checkclosed = this::checkClosed;
 
-        closer = new Thread(checkclosed);
-        closer.start();
+        main.pool.execute(checkclosed);
 
         Runnable reader = () -> {
             try {
@@ -55,19 +61,24 @@ public class SocketConnection {
                 main.server.logger.printStackTrace(e);
             }
         };
-        packetreader = new Thread(reader);
-        packetreader.start();
+        main.pool.execute(reader);
     }
 
     public void checkClosed() {
         for (; ; ) {
             boolean closed = false;
+            if(stopcloser) {
+                break;
+            }
             try {
                 await().until(() -> lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed());
             } catch (ConditionTimeoutException e) {
                 continue;
             }
-            while (lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed()) {
+            while (stopcloser || lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed()) {
+                if(stopcloser) {
+                    break;
+                }
                 try {
                     close();
                     closed = true;
@@ -76,16 +87,18 @@ public class SocketConnection {
                     main.server.logger.printStackTrace(e);
                 }
             }
-            if(closed) break;
+            if(stopcloser) {
+                break;
+            }
+            if (closed) break;
         }
     }
 
     public void close() throws IOException {
         main.server.logger.info("Closing connection");
-        if(packetreader != null) packetreader.interrupt();
-        packetreader = null;
-        if(in != null) in.close();
-        if(out != null) out.close();
+        stopcloser = true;
+        if (in != null) in.close();
+        if (out != null) out.close();
         in = null;
         out = null;
         if (!sock.isClosed()) {
@@ -94,8 +107,7 @@ public class SocketConnection {
         if (!verified) {
             main.newconns.remove(this);
         }
-        if(closer != null) closer.interrupt();
-        closer = null;
+        stopreader = true;
     }
 
     public void send(ByteArrayDataOutput out) throws IOException {
@@ -110,11 +122,28 @@ public class SocketConnection {
         p.conn = this;
         ByteArrayDataOutput dat = p.buildOutput();
         if (dat != null) {
-            main.server.logger.info(String.format("Sending packet of name %s and id %s", p.name, p.id), Arrays.toString(dat.toByteArray()));
-            VarInt.writeVarInt(out, dat.toByteArray().length + 1);
-            VarInt.writeVarInt(out, p.id);
+            String dbgp = "";
+            if(this.encrypted) {
+                dbgp += "(Encrypted) ";
+            }
+            main.server.logger.info(String.format("%sSending packet of name %s and id %s", dbgp, p.name, p.id), Arrays.toString(dat.toByteArray()));
+            if (encrypted) {
+                VarInt.writeEncryptedVarInt(out, dat.toByteArray().length + 1, encryptc);
+                VarInt.writeEncryptedVarInt(out, p.id, encryptc);
+            } else {
+                VarInt.writeVarInt(out, dat.toByteArray().length + 1);
+                VarInt.writeVarInt(out, p.id);
+            }
             for (byte d : dat.toByteArray()) {
-                out.writeByte(d);
+                if(encrypted) {
+                    try {
+                        out.writeByte(encryptc.doFinal(Bytes.byteToArray(d))[0]);
+                    } catch (IllegalBlockSizeException | BadPaddingException e) {
+                        main.server.logger.printStackTrace(e);
+                    }
+                } else {
+                    out.writeByte(d);
+                }
             }
             out.flush();
         }
@@ -122,7 +151,10 @@ public class SocketConnection {
 
     public void readPackets() throws IOException, InterruptedException {
         for (; ; ) {
-            if(in == null || out == null) {
+            if(stopreader) {
+                break;
+            }
+            if (in == null || out == null) {
                 break;
             }
             try {
@@ -130,22 +162,39 @@ public class SocketConnection {
             } catch (ConditionTimeoutException e) {
                 continue;
             }
-            while (in != null && in.available() > 0) {
-                int len = VarInt.readVarInt(in);
-                int id = VarInt.readVarInt(in);
+            while (stopreader || (in != null && in.available() > 0)) {
+                if(stopreader) {
+                    break;
+                }
+                int len;
+                int id;
+                if (encrypted) {
+                    len = VarInt.readEncryptedVarInt(in, decryptc);
+                    id = VarInt.readEncryptedVarInt(in, decryptc);
+                } else {
+                    len = VarInt.readVarInt(in);
+                    id = VarInt.readVarInt(in);
+                }
                 byte[] data = new byte[len];
 
                 for (int i = 0; i < len - 1; i++) {
                     try {
-                        data[i] = in.readByte();
-                    } catch (EOFException e) {
+                        if (encrypted) {
+                            data[i] = decryptc.doFinal(Bytes.byteToArray(in.readByte()))[0];
+                        } else {
+                            data[i] = in.readByte();
+                        }
+                    } catch (EOFException | BadPaddingException | IllegalBlockSizeException e) {
                         continue;
                     }
                 }
                 ByteArrayDataInput in = ByteStreams.newDataInput(data);
-                main.server.logger.info(String.valueOf(state), Integer.toString(len), Integer.toString(id), Arrays.toString(data));
+                main.server.logger.info(String.valueOf(this.encrypted), String.valueOf(state), Integer.toString(len), Integer.toString(id), Arrays.toString(data));
                 lastpacket = System.currentTimeMillis();
                 Translator.translate(len, id, in, this);
+            }
+            if(stopreader) {
+                break;
             }
         }
     }

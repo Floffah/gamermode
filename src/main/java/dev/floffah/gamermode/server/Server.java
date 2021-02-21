@@ -12,18 +12,13 @@ import dev.floffah.gamermode.visuals.gui.GuiWindow;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Server {
     public static Server server;
@@ -36,6 +31,7 @@ public class Server {
     public Config conf;
     public int protver = 754;
     public KeyPairGenerator kpg;
+    public File confile;
 
     SocketManager sock;
 
@@ -55,14 +51,12 @@ public class Server {
             if (this.args.contains("-usewd")) {
                 parent = System.getProperty("user.dir");
             }
-            logger.info(parent);
-            File confile = Path.of(parent, "config.yml").toFile();
+            confile = Path.of(parent, "config.yml").toFile();
             if (!confile.exists()) {
                 conf = new Config();
-                setDefaultConfig();
-                om.writeValue(confile, conf);
+                saveConfig();
             }
-            conf = om.readValue(confile, Config.class);
+            loadConfig();
         } catch (URISyntaxException | IOException e) {
             logger.printStackTrace(e);
         }
@@ -82,13 +76,18 @@ public class Server {
         }
     }
 
-    public void setDefaultConfig() {
-        conf.players = new Config.PlayerConf();
-        conf.players.max = 20;
+    public void loadConfig() throws IOException {
+        conf = om.readValue(confile, Config.class);
+    }
+
+    public void saveConfig() throws IOException {
+        om.writeValue(confile, conf);
     }
 
     public void shutDown() throws IOException {
         events.execute(new ShutdownEvent());
+
+        saveConfig();
 
         logger.info("Goodbye!");
 
@@ -96,14 +95,7 @@ public class Server {
             conn.close();
         }
 
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                timer.purge();
-                win.stop();
-                System.exit(0);
-            }
-        }, 2000);
+        win.stop();
+        System.exit(0);
     }
 }

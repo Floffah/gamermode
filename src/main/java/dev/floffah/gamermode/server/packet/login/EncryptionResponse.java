@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.server.packet.connection.LoginDisconnect;
+import dev.floffah.gamermode.util.Chat;
 import dev.floffah.gamermode.util.VarInt;
 
 import javax.crypto.BadPaddingException;
@@ -37,22 +38,22 @@ public class EncryptionResponse extends BasePacket {
 
         byte[] decrypted;
         try {
-            Cipher c = Cipher.getInstance(conn.kp.getPublic().getAlgorithm());
-            c.init(Cipher.DECRYPT_MODE, conn.kp.getPrivate());
-            decrypted = c.doFinal(vt);
-        } catch (IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
+            conn.decryptc = Cipher.getInstance(conn.kp.getPrivate().getAlgorithm());
+            conn.decryptc.init(Cipher.DECRYPT_MODE, conn.kp.getPrivate());
+            decrypted = conn.decryptc.doFinal(vt);
+            conn.encryptc = Cipher.getInstance(conn.kp.getPublic().getAlgorithm());
+            conn.encryptc.init(Cipher.ENCRYPT_MODE, conn.kp.getPublic());
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             conn.main.server.logger.printStackTrace(e);
             return;
         }
-        if (!Arrays.equals(conn.verifytoken, decrypted)) {
-            conn.send(new LoginDisconnect("""
-                    {
-                      "text": "Invalid verify token",
-                      "color": "red"
-                    }"""));
-            conn.close();
-        } else {
+        conn.encrypted = true;
+        if (Arrays.equals(conn.verifytoken, decrypted)) {
             conn.send(new LoginSuccess());
+            //conn.send(new JoinGame());
+        } else {
+            conn.send(new LoginDisconnect(Chat.translateToBasic('&', "&cClient failed encryption request.")));
+            conn.close();
         }
     }
 }

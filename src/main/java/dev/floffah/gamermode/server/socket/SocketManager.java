@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SocketManager {
     int port = 25565;
@@ -13,7 +15,8 @@ public class SocketManager {
     ServerSocket sock;
 
     public Server server;
-    Thread lthread;
+
+    ExecutorService pool = Executors.newCachedThreadPool();
 
     public Map<UUID, SocketConnection> verified = new HashMap<>();
     public List<SocketConnection> newconns = new LinkedList<>();
@@ -42,14 +45,14 @@ public class SocketManager {
             }
         };
 
-        lthread = new Thread(listener);
-        lthread.start();
+        pool.execute(listener);
     }
 
     public void stop() throws IOException {
 //        in.close();
 //        out.close();
 //        csock.close();
+        pool.shutdown();
         sock.close();
     }
 }

@@ -7,8 +7,6 @@ import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.util.VarInt;
 
 import java.io.IOException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
