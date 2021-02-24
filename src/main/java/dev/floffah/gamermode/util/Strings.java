@@ -19,10 +19,8 @@ public class Strings {
     }
 
     public static void writeUTF(String str, ByteArrayDataOutput out) throws IOException {
-        VarInt.writeVarInt(out, str.length());
         byte[] data = str.getBytes(StandardCharsets.UTF_8);
-        for(byte d : data) {
-            out.writeByte(d);
-        }
+        VarInt.writeVarInt(out, data.length);
+        out.write(data);
     }
 }

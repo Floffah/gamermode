@@ -32,7 +32,7 @@ public class SocketManager {
 
     public void listen() {
         Runnable listener = () -> {
-            while(true) {
+            for( ; ;) {
                 try {
                     server.logger.info("Accepting connection...");
                     Socket csock = sock.accept();

@@ -30,37 +30,20 @@ public class LoginSuccess extends BasePacket {
         con.setRequestMethod("GET");
 
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String content = "";
+        StringBuilder content = new StringBuilder();
         String currentline;
         while ((currentline = in.readLine()) != null) {
-            content += currentline;
+            content.append(currentline);
         }
         in.close();
         con.disconnect();
 
         System.out.println(content);
 
-        JSONObject obj = new JSONObject(content);
+        JSONObject obj = new JSONObject(content.toString());
         String unformatted = obj.getString("id");
         String formatted = String.format("%s-%s-%s-%s-%s", unformatted.substring(0, 7), unformatted.substring(7, 11), unformatted.substring(11, 15), unformatted.substring(15, 20), unformatted.substring(20));
         UUID uuid = UUID.fromString(formatted);
-        ByteBuffer uuidbytes = ByteBuffer.wrap(new byte[16]);
-//        uuidbytes.putLong((uuid.getMostSignificantBits() * 2) & 0xffffffff);
-//        uuidbytes.putLong((uuid.getLeastSignificantBits() * 2) & 0xffffffff);
-//        uuidbytes.putLong(uuid.getMostSignificantBits() * 2);
-//        uuidbytes.putLong(uuid.getLeastSignificantBits() * 2);
-
-//        BigInteger bileast = BigInteger.valueOf(Long.MAX_VALUE)
-//                .add(BigInteger.valueOf(uuid.getLeastSignificantBits()));
-//        BigInteger bimost = BigInteger.valueOf(Long.MAX_VALUE)
-//                .add(BigInteger.valueOf(uuid.getMostSignificantBits()));
-//
-//        out.writeLong(bimost.longValue());
-//        out.writeLong(bileast.longValue());
-
-//        for (byte b : uuidbytes.array()) {
-//            out.writeByte(b);
-//        }
 
         out.writeLong(uuid.getMostSignificantBits());
         out.writeLong(uuid.getLeastSignificantBits());
