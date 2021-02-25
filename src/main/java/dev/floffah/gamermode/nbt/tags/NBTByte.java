@@ -18,16 +18,14 @@ public class NBTByte extends NBTTag {
         NBTByte nbyte = new NBTByte();
 
         if (named) {
-            nbyte.name = in.readUTF();
+            short namelen = in.readShort();
+            System.out.println(namelen);
+            byte[] namebytes = new byte[namelen];
+            for (int i = 0; i < namelen; i++) {
+                namebytes[i] = in.readByte();
+            }
 
-//            short namelen = in.readShort();
-//            System.out.println(namelen);
-//            byte[] namebytes = new byte[namelen];
-//            for (int i = 0; i < namelen; i++) {
-//                namebytes[i] = in.readByte();
-//            }
-//
-//            nbyte.name = new String(namebytes, StandardCharsets.UTF_8);
+            nbyte.name = new String(namebytes, StandardCharsets.UTF_8);
         }
 
         nbyte.value = in.readByte();
