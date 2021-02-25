@@ -20,7 +20,7 @@ public class JoinGame extends BasePacket {
 
         out.writeInt(20);
         out.writeBoolean(false);
-        out.write(0);
+        out.write(((byte)0) & 0xFF);
         out.writeByte(-1);
         VarInt.writeVarInt(out, 0);
 

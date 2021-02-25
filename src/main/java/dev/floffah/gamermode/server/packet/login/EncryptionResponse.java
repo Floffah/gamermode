@@ -50,7 +50,7 @@ public class EncryptionResponse extends BasePacket {
         conn.encrypted = true;
         if (Arrays.equals(conn.verifytoken, decrypted)) {
             conn.send(new LoginSuccess());
-            //conn.send(new JoinGame());
+            conn.send(new JoinGame());
         } else {
             conn.send(new LoginDisconnect(Chat.translateToBasic('&', "&cClient failed encryption request.")));
             conn.close();
