@@ -1,23 +1,24 @@
 package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 import com.google.errorprone.annotations.ForOverride;
 
 public class NBTTag {
-    NBTType type;
-    public String name = null;
+    public NBTType type;
+    public String name;
 
     public NBTTag(NBTType type) {
         this.type = type;
     }
 
     @ForOverride
-    public static NBTTag fromByteArray(ByteArrayDataInput in, boolean named) {
-        return null;
+    public void toByteArray(ByteArrayDataOutput out, boolean named) {
+
     }
 
     @ForOverride
-    public static NBTTag fromByteArray(ByteArrayDataInput in) {
+    public static NBTTag fromByteArray(ByteArrayDataInput in, boolean named) {
         return null;
     }
 }

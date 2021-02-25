@@ -1,6 +1,7 @@
 package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 
 import java.nio.charset.StandardCharsets;
 
@@ -30,7 +31,13 @@ public class NBTFloat extends NBTTag {
         return nfloat;
     }
 
-    public static NBTFloat fromByteArray(ByteArrayDataInput in) {
-        return fromByteArray(in, true);
+    @Override
+    public void toByteArray(ByteArrayDataOutput out, boolean named) {
+        if(named) {
+            byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
+            out.writeShort(b.length);
+            out.write(b);
+        }
+        out.writeFloat(this.value);
     }
 }

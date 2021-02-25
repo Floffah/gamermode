@@ -1,6 +1,7 @@
 package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -75,7 +76,19 @@ public class NBTList extends NBTTag {
         return nlist;
     }
 
-    public static NBTList fromByteArray(ByteArrayDataInput in) {
-        return fromByteArray(in, true);
+    @Override
+    public void toByteArray(ByteArrayDataOutput out, boolean named) {
+        if(named) {
+            byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
+            out.writeShort(b.length);
+            out.write(b);
+        }
+
+        out.writeByte(this.valtype.ordinal());
+        out.writeInt(this.value.size());
+
+        for (NBTTag tag : this.value) {
+            tag.toByteArray(out, false);
+        }
     }
 }
