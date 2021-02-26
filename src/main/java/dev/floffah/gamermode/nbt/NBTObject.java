@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import dev.floffah.gamermode.nbt.tags.NBTCompound;
+import dev.floffah.gamermode.nbt.tags.NBTType;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class NBTObject {
     }
 
     public void write(ByteArrayDataOutput out) {
+        out.writeByte(NBTType.COMPOUND.ordinal());
         root.toByteArray(out, true);
     }
 }

@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class NBTShort extends NBTTag {
     public short value;
-    public String name;
 
     public NBTShort() {
         super(NBTType.SHORT);

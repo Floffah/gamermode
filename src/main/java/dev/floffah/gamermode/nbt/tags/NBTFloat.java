@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class NBTFloat extends NBTTag {
     public float value;
-    public String name;
 
     public NBTFloat() {
         super(NBTType.FLOAT);

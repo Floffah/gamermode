@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class NBTByteArray extends NBTTag {
     public byte[] value;
-    public String name;
 
     public NBTByteArray() {
         super(NBTType.BYTE_ARRAY);
@@ -47,7 +46,7 @@ public class NBTByteArray extends NBTTag {
         }
         out.writeInt(value.length);
         for (byte b : value) {
-            out.writeByte(b);
+            out.write(b);
         }
     }
 }

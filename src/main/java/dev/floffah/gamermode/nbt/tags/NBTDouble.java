@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class NBTDouble extends NBTTag {
     public double value;
-    public String name;
 
     public NBTDouble() {
         super(NBTType.DOUBLE);

@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class NBTIntArray extends NBTTag {
     public int[] value;
-    public String name;
 
     public NBTIntArray() {
         super(NBTType.INT_ARRAY);

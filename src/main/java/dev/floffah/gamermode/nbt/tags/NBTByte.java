@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 
 public class NBTByte extends NBTTag {
     public byte value;
-    public String name;
 
     public NBTByte() {
         super(NBTType.BYTE);

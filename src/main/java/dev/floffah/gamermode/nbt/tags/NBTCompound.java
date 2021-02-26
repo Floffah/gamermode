@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 public class NBTCompound extends NBTTag {
     public HashMap<String, NBTTag> data = new HashMap<>();
-    public String name;
 
     public NBTCompound() {
         super(NBTType.COMPOUND);
@@ -57,10 +56,11 @@ public class NBTCompound extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        out.writeByte(this.type.ordinal());
-        byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
-        out.writeShort(b.length);
-        out.write(b);
+        if(named) {
+            byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
+            out.writeShort(b.length);
+            out.write(b);
+        }
 
         for (String s : this.data.keySet()) {
             NBTTag tag = this.data.get(s);

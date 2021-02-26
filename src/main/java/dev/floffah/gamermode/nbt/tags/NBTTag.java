@@ -4,7 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.errorprone.annotations.ForOverride;
 
-public class NBTTag {
+public abstract class NBTTag {
     public NBTType type;
     public String name;
 
@@ -13,9 +13,7 @@ public class NBTTag {
     }
 
     @ForOverride
-    public void toByteArray(ByteArrayDataOutput out, boolean named) {
-
-    }
+    public abstract void toByteArray(ByteArrayDataOutput out, boolean named);
 
     @ForOverride
     public static NBTTag fromByteArray(ByteArrayDataInput in, boolean named) {

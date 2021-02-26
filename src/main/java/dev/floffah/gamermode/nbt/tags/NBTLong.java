@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 public class NBTLong extends NBTTag {
     public long value;
-    public String name;
 
     public NBTLong() {
         super(NBTType.LONG);

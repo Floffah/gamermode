@@ -13,7 +13,6 @@ public class NBTList extends NBTTag {
     public Set<NBTTag> value = new HashSet<>();
     public NBTType valtype;
     public int vallen;
-    public String name;
 
     public NBTList() {
         super(NBTType.LIST);
