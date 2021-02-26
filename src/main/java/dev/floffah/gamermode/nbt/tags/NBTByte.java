@@ -18,7 +18,6 @@ public class NBTByte extends NBTTag {
 
         if (named) {
             short namelen = in.readShort();
-            System.out.println(namelen);
             byte[] namebytes = new byte[namelen];
             for (int i = 0; i < namelen; i++) {
                 namebytes[i] = in.readByte();

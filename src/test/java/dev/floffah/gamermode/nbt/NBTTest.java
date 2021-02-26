@@ -17,7 +17,7 @@ public class NBTTest {
     @Test
     @DisplayName("Read and write a copy test using wiki.vg bigtest")
     @Order(1)
-    public void bigtestread() throws IOException {
+    public void bigtest() throws IOException {
         InputStream inp = this.getClass().getResourceAsStream("/bigtest.nbt");
         DataInputStream in = new DataInputStream(inp);
         nbt.read(in);
@@ -31,15 +31,20 @@ public class NBTTest {
         Assertions.assertTrue(outb.length > 0);
     }
 
-//    @Test
-//    @DisplayName("Write read nbt as new file to compare to original bigtest")
-//    @Order(2)
-//    public void bigtestwrite() throws IOException {
-//        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-//        nbt.write(out);
-//        File outf = new File("/bigtest.copy.nbt");
-//        byte[] outb = out.toByteArray();
-//        FileUtils.writeByteArrayToFile(outf, outb);
-//        Assertions.assertTrue(outb.length > 0);
-//    }
+    @Test
+    @DisplayName("Read gzipped and write uncompressed copy test using wiki.vg bigtest")
+    @Order(1)
+    public void gzipbigtest() throws IOException {
+        InputStream inp = this.getClass().getResourceAsStream("/bigtest.nbt.gz");
+        DataInputStream in = new DataInputStream(inp);
+        nbt.read(in, true);
+
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        nbt.write(out);
+        File outf = new File("bigtest.copy.ungz.nbt");
+        System.out.println(outf.getAbsolutePath());
+        byte[] outb = out.toByteArray();
+        FileUtils.writeByteArrayToFile(outf, outb);
+        Assertions.assertTrue(outb.length > 0);
+    }
 }

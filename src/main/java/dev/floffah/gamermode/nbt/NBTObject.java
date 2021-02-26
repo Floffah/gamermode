@@ -8,6 +8,8 @@ import dev.floffah.gamermode.nbt.tags.NBTType;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 public class NBTObject {
     NBTCompound root;
@@ -17,7 +19,17 @@ public class NBTObject {
     }
 
     public void read(DataInputStream in) throws IOException {
-        ByteArrayDataInput bin = ByteStreams.newDataInput(in.readAllBytes());
+        read(in, false);
+    }
+
+    public void read(DataInputStream in, boolean gzipped) throws IOException {
+        ByteArrayDataInput bin;
+        if(gzipped) {
+            GZIPInputStream gzin = new GZIPInputStream(in);
+            bin = ByteStreams.newDataInput(gzin.readAllBytes());
+        } else {
+            bin = ByteStreams.newDataInput(in.readAllBytes());
+        }
         this.read(bin);
     }
 
