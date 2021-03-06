@@ -1,6 +1,0 @@
----
-configVersion: 1001
-players:
-  max: 20
-info:
-  motd: "Minecraft server"

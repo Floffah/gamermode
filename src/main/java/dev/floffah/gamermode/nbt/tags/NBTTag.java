@@ -13,10 +13,10 @@ public abstract class NBTTag {
     }
 
     @ForOverride
-    public abstract void toByteArray(ByteArrayDataOutput out, boolean named);
-
-    @ForOverride
     public static NBTTag fromByteArray(ByteArrayDataInput in, boolean named) {
         return null;
     }
+
+    @ForOverride
+    public abstract void toByteArray(ByteArrayDataOutput out, boolean named);
 }

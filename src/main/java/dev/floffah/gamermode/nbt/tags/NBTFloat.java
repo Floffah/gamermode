@@ -12,10 +12,22 @@ public class NBTFloat extends NBTTag {
         super(NBTType.FLOAT);
     }
 
+    public static NBTFloat quick(String name, float value) {
+        NBTFloat i = new NBTFloat();
+        i.name = name;
+        i.value = value;
+        return i;
+    }
+
+    public static void compound(NBTCompound c, String name, float value) {
+        NBTFloat str = quick(name, value);
+        c.data.put(str.name, str);
+    }
+
     public static NBTFloat fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTFloat nfloat = new NBTFloat();
 
-        if(named) {
+        if (named) {
             short namelen = in.readShort();
             byte[] namebytes = new byte[namelen];
             for (int i = 0; i < namelen; i++) {
@@ -32,11 +44,19 @@ public class NBTFloat extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
         }
         out.writeFloat(this.value);
+    }
+
+    public float getValue() {
+        return value;
+    }
+
+    public void setValue(float value) {
+        this.value = value;
     }
 }

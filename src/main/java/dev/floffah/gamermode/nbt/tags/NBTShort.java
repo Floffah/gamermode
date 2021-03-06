@@ -15,7 +15,7 @@ public class NBTShort extends NBTTag {
     public static NBTShort fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTShort nshort = new NBTShort();
 
-        if(named) {
+        if (named) {
             short namelen = in.readShort();
             byte[] namebytes = new byte[namelen];
             for (int i = 0; i < namelen; i++) {
@@ -32,11 +32,19 @@ public class NBTShort extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
         }
         out.writeShort(value);
+    }
+
+    public short getValue() {
+        return value;
+    }
+
+    public void setValue(short value) {
+        this.value = value;
     }
 }

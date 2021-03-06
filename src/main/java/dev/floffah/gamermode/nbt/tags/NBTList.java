@@ -12,7 +12,7 @@ import java.util.Set;
 public class NBTList extends NBTTag {
     public Set<NBTTag> value = new HashSet<>();
     public NBTType valtype;
-    public int vallen;
+    public int vallen = -1;
 
     public NBTList() {
         super(NBTType.LIST);
@@ -51,8 +51,8 @@ public class NBTList extends NBTTag {
         else if (type == NBTType.STRING.ordinal()) typecl = NBTString.class;
         else if (type == NBTType.LIST.ordinal()) typecl = NBTList.class;
         else if (type == NBTType.COMPOUND.ordinal()) typecl = NBTCompound.class;
-        else if(type == NBTType.INT_ARRAY.ordinal()) typecl = NBTIntArray.class;
-        else if(type == NBTType.LONG_ARRAY.ordinal()) typecl = NBTLongArray.class;
+        else if (type == NBTType.INT_ARRAY.ordinal()) typecl = NBTIntArray.class;
+        else if (type == NBTType.LONG_ARRAY.ordinal()) typecl = NBTLongArray.class;
 
         Method invoker = null;
         try {
@@ -77,17 +77,26 @@ public class NBTList extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
         }
 
         out.writeByte(this.valtype.ordinal());
-        out.writeInt(this.value.size());
+        this.vallen = this.value.size();
+        out.writeInt(this.vallen);
 
         for (NBTTag tag : this.value) {
             tag.toByteArray(out, false);
         }
+    }
+
+    public int getVallen() {
+        return vallen;
+    }
+
+    public void setValue(Set<NBTTag> value) {
+        this.value = value;
     }
 }

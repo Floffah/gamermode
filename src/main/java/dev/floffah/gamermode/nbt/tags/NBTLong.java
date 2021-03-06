@@ -32,11 +32,19 @@ public class NBTLong extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
         }
         out.writeLong(value);
+    }
+
+    public long getValue() {
+        return value;
+    }
+
+    public void setValue(long value) {
+        this.value = value;
     }
 }

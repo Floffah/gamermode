@@ -39,7 +39,7 @@ public class NBTByteArray extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
@@ -48,5 +48,13 @@ public class NBTByteArray extends NBTTag {
         for (byte b : value) {
             out.write(b);
         }
+    }
+
+    public byte[] getValue() {
+        return value;
+    }
+
+    public void setValue(byte[] value) {
+        this.value = value;
     }
 }

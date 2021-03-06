@@ -12,10 +12,22 @@ public class NBTString extends NBTTag {
         super(NBTType.STRING);
     }
 
+    public static NBTString quick(String name, String value) {
+        NBTString str = new NBTString();
+        str.name = name;
+        str.value = value;
+        return str;
+    }
+
+    public static void compound(NBTCompound c, String name, String value) {
+        NBTString str = quick(name, value);
+        c.data.put(str.name, str);
+    }
+
     public static NBTString fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTString nstr = new NBTString();
 
-        if(named) {
+        if (named) {
             short namelen = in.readShort();
             byte[] namebytes = new byte[namelen];
             for (int i = 0; i < namelen; i++) {
@@ -38,7 +50,7 @@ public class NBTString extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
@@ -50,5 +62,13 @@ public class NBTString extends NBTTag {
         for (byte b : bs) {
             out.writeByte(b);
         }
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

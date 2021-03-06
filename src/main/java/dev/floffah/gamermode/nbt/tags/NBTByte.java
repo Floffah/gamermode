@@ -2,7 +2,6 @@ package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 
@@ -11,6 +10,18 @@ public class NBTByte extends NBTTag {
 
     public NBTByte() {
         super(NBTType.BYTE);
+    }
+
+    public static NBTByte quick(String name, byte value) {
+        NBTByte i = new NBTByte();
+        i.name = name;
+        i.value = value;
+        return i;
+    }
+
+    public static void compound(NBTCompound c, String name, byte value) {
+        NBTByte str = quick(name, value);
+        c.data.put(str.name, str);
     }
 
     public static NBTByte fromByteArray(ByteArrayDataInput in, boolean named) {
@@ -33,11 +44,19 @@ public class NBTByte extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
         }
         out.writeByte(value);
+    }
+
+    public byte getValue() {
+        return value;
+    }
+
+    public void setValue(byte value) {
+        this.value = value;
     }
 }

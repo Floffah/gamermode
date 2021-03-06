@@ -44,7 +44,7 @@ public class NBTCompound extends NBTTag {
             else if (type == NBTType.LIST.ordinal()) tag = NBTList.fromByteArray(in, true);
             else if (type == NBTType.COMPOUND.ordinal()) tag = NBTCompound.fromByteArray(in, true);
             else if (type == NBTType.INT_ARRAY.ordinal()) tag = NBTIntArray.fromByteArray(in, true);
-            else if (type == NBTType.LONG_ARRAY.ordinal()) tag = NBTLongArray.fromByteArray(in,true);
+            else if (type == NBTType.LONG_ARRAY.ordinal()) tag = NBTLongArray.fromByteArray(in, true);
 
             if (tag != null) {
                 compound.data.put(tag.name, tag);
@@ -56,7 +56,7 @@ public class NBTCompound extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
@@ -69,5 +69,13 @@ public class NBTCompound extends NBTTag {
         }
 
         out.writeByte(0);
+    }
+
+    public HashMap<String, NBTTag> getData() {
+        return data;
+    }
+
+    public void setData(HashMap<String, NBTTag> data) {
+        this.data = data;
     }
 }

@@ -12,10 +12,22 @@ public class NBTDouble extends NBTTag {
         super(NBTType.DOUBLE);
     }
 
+    public static NBTDouble quick(String name, double value) {
+        NBTDouble i = new NBTDouble();
+        i.name = name;
+        i.value = value;
+        return i;
+    }
+
+    public static void compound(NBTCompound c, String name, double value) {
+        NBTDouble str = quick(name, value);
+        c.data.put(str.name, str);
+    }
+
     public static NBTDouble fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTDouble ndouble = new NBTDouble();
 
-        if(named) {
+        if (named) {
             short namelen = in.readShort();
             byte[] namebytes = new byte[namelen];
             for (int i = 0; i < namelen; i++) {
@@ -32,11 +44,19 @@ public class NBTDouble extends NBTTag {
 
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
-        if(named) {
+        if (named) {
             byte[] b = this.name.getBytes(StandardCharsets.UTF_8);
             out.writeShort(b.length);
             out.write(b);
         }
         out.writeDouble(this.value);
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
     }
 }

@@ -18,19 +18,36 @@ public class NBTObject {
 
     }
 
+    public NBTCompound getRoot() {
+        return root;
+    }
+
+    public void setRoot(NBTCompound root) {
+        this.root = root;
+    }
+
     public void read(DataInputStream in) throws IOException {
         read(in, false);
     }
 
     public void read(DataInputStream in, boolean gzipped) throws IOException {
         ByteArrayDataInput bin;
-        if(gzipped) {
+        if (gzipped) {
             GZIPInputStream gzin = new GZIPInputStream(in);
             bin = ByteStreams.newDataInput(gzin.readAllBytes());
         } else {
             bin = ByteStreams.newDataInput(in.readAllBytes());
         }
         this.read(bin);
+    }
+
+    public void read(ByteArrayDataInput in, boolean gzipped) throws IOException {
+        read(new DataInputStream(new InputStream() {
+            @Override
+            public int read() throws IOException {
+                return in.readByte();
+            }
+        }));
     }
 
     public void read(ByteArrayDataInput in) {
