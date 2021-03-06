@@ -107,6 +107,46 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <reportOutputDirectory>${project.basedir}/docs</reportOutputDirectory>
+                    <destDir>docs</destDir>
+                    <show>private</show>
+                    <detectLinks>true</detectLinks>
+                    <detectOfflineLinks>true</detectOfflineLinks>
+                    <detectJavaApiLink>true</detectJavaApiLink>
+                    <nohelp>true</nohelp>
+                    <links>
+                        <link>https://guava.dev/releases/snapshot-jre/api/docs/</link>
+                        <link>https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.12.2/</link>
+                        <link>https://fasterxml.github.io/jackson-dataformats-text/javadoc/yaml/2.12/</link>
+                        <link>https://javadoc.io/doc/org.jetbrains/annotations/20.1.0/</link>
+                        <link>https://commons.apache.org/proper/commons-io/javadocs/api-2.5/</link>
+                    </links>
+                    <linksource>true</linksource>
+                    <notimestamp>true</notimestamp>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <charset>UTF-8</charset>
+                    <source>15</source>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
         </plugins>
     </build>
 
