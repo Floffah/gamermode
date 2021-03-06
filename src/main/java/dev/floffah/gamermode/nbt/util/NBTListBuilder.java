@@ -16,6 +16,7 @@ public class NBTListBuilder {
         this.type = type;
         lst = new NBTList();
         lst.name = name;
+        lst.valtype = type;
     }
 
     public NBTListBuilder put(NBTTag tag) {

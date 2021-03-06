@@ -24,20 +24,20 @@ public class Translator {
     public static BasePacket identify(int id, SocketConnection conn) {
         BasePacket b = new BasePacket("UNKNOWN", 0x00, PacketType.UNKNOWN);
 
-        if(conn.state == ConnectionState.HANDSHAKE) {
-            if(id == 0x00) {
+        if (conn.state == ConnectionState.HANDSHAKE) {
+            if (id == 0x00) {
                 b = new Handshake();
             }
-        } else if(conn.state == ConnectionState.STATUS) {
-            if(id == 0x00) {
+        } else if (conn.state == ConnectionState.STATUS) {
+            if (id == 0x00) {
                 b = new Request();
-            } else if(id == 0x01) {
+            } else if (id == 0x01) {
                 b = new Ping();
             }
-        } else if(conn.state == ConnectionState.LOGIN) {
-            if(id == 0x00) {
+        } else if (conn.state == ConnectionState.LOGIN) {
+            if (id == 0x00) {
                 b = new LoginStart();
-            } else if(id == 0x01) {
+            } else if (id == 0x01) {
                 b = new EncryptionResponse();
             }
         }

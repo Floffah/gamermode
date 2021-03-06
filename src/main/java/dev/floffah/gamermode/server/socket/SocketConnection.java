@@ -52,7 +52,7 @@ public class SocketConnection {
 
         Runnable checkclosed = this::checkClosed;
 
-        main.pool.execute(checkclosed);
+        main.server.pool.execute(checkclosed);
 
         Runnable reader = () -> {
             try {
@@ -61,13 +61,13 @@ public class SocketConnection {
                 main.server.logger.printStackTrace(e);
             }
         };
-        main.pool.execute(reader);
+        main.server.pool.execute(reader);
     }
 
     public void checkClosed() {
         for (; ; ) {
             boolean closed = false;
-            if(stopcloser) {
+            if (stopcloser) {
                 break;
             }
             try {
@@ -76,7 +76,7 @@ public class SocketConnection {
                 continue;
             }
             while (stopcloser || lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed()) {
-                if(stopcloser) {
+                if (stopcloser) {
                     break;
                 }
                 try {
@@ -87,7 +87,7 @@ public class SocketConnection {
                     main.server.logger.printStackTrace(e);
                 }
             }
-            if(stopcloser) {
+            if (stopcloser) {
                 break;
             }
             if (closed) break;
@@ -119,39 +119,74 @@ public class SocketConnection {
     }
 
     public void send(BasePacket p) throws IOException {
+        send(p, false);
+    }
+
+    public void send(BasePacket p, boolean disableEncryption) throws IOException {
         p.conn = this;
         ByteArrayDataOutput dat = p.buildOutput();
+        ByteArrayDataOutput prc = ByteStreams.newDataOutput();
+//        if (encrypted && !disableEncryption) {
+//            try {
+//                encryptc.init(Cipher.ENCRYPT_MODE, kp.getPublic());
+//            } catch (Exception e) {
+//                main.server.logger.printStackTrace(e);
+//                return;
+//            }
+//        }
         if (dat != null) {
             String dbgp = "";
-            if(this.encrypted) {
+            if (this.encrypted && !disableEncryption) {
                 dbgp += "(Encrypted) ";
             }
-            main.server.logger.info(String.format("%sSending packet of name %s and id %s", dbgp, p.name, p.id), Arrays.toString(dat.toByteArray()));
-            if (encrypted) {
-                VarInt.writeEncryptedVarInt(out, dat.toByteArray().length + 1, encryptc);
-                VarInt.writeEncryptedVarInt(out, p.id, encryptc);
-            } else {
-                VarInt.writeVarInt(out, dat.toByteArray().length + 1);
-                VarInt.writeVarInt(out, p.id);
-            }
+            main.server.logger.info(String.format("%sSending packet of name %s and id %s (current length %s)", dbgp, p.name, p.id, dat.toByteArray().length), Arrays.toString(dat.toByteArray()));
+//            if (encrypted) {
+//                VarInt.writeEncryptedVarInt(out, dat.toByteArray().length + 1, encryptc);
+//                VarInt.writeEncryptedVarInt(out, p.id, encryptc);
+//            } else {
+            VarInt.writeVarInt(prc, dat.toByteArray().length + 1);
+            VarInt.writeVarInt(prc, p.id);
+            //}
             for (byte d : dat.toByteArray()) {
-                if(encrypted) {
-                    try {
-                        out.writeByte(encryptc.doFinal(Bytes.byteToArray(d))[0]);
-                    } catch (IllegalBlockSizeException | BadPaddingException e) {
-                        main.server.logger.printStackTrace(e);
-                    }
-                } else {
-                    out.writeByte(d);
-                }
+//                if (encrypted) {
+//                    try {
+//                        out.writeByte(encryptc.doFinal(Bytes.byteToArray(d))[0]);
+//                    } catch (IllegalBlockSizeException | BadPaddingException e) {
+//                        main.server.logger.printStackTrace(e);
+//                    }
+//                } else {
+                prc.writeByte(d);
+                //}
             }
+            byte[] sent;
+            if (encrypted && !disableEncryption) {
+                try {
+                    sent = encryptc.update(prc.toByteArray());
+                } catch (Exception e) {
+                    main.server.logger.printStackTrace(e);
+                    return;
+                }
+            } else {
+                sent = prc.toByteArray();
+            }
+//            if(encrypted && !disableEncryption) {
+//                try {
+//                    sent = encryptc.update();
+//                } catch (Exception e) {
+//                    main.server.logger.printStackTrace(e);
+//                    return;
+//                }
+//            }
+            out.write(sent);
+
+            main.server.logger.info(String.format("%sSent packet of name %s and id %s of length %s", dbgp, p.name, p.id, sent.length), Arrays.toString(sent));
             out.flush();
         }
     }
 
     public void readPackets() throws IOException, InterruptedException {
         for (; ; ) {
-            if(stopreader) {
+            if (stopreader) {
                 break;
             }
             if (in == null || out == null) {
@@ -163,7 +198,7 @@ public class SocketConnection {
                 continue;
             }
             while (stopreader || (in != null && in.available() > 0)) {
-                if(stopreader) {
+                if (stopreader) {
                     break;
                 }
                 int len;
@@ -193,7 +228,7 @@ public class SocketConnection {
                 lastpacket = System.currentTimeMillis();
                 Translator.translate(len, id, in, this);
             }
-            if(stopreader) {
+            if (stopreader) {
                 break;
             }
         }

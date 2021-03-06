@@ -23,7 +23,7 @@ public class Handshake extends BasePacket {
         conn.protver = protocol;
         conn.addrused = addr;
         conn.portused = port;
-        if(next == 1) {
+        if (next == 1) {
             conn.serverlist = true;
             conn.state = ConnectionState.STATUS;
         } else {

@@ -19,9 +19,9 @@ public class EventEmitter {
     }
 
     public void execute(Event e) {
-        if(lnrs.containsKey(e.getClass())) {
+        if (lnrs.containsKey(e.getClass())) {
             List<Executor> ex = lnrs.get(e.getClass());
-            for(Executor exe : ex) {
+            for (Executor exe : ex) {
                 exe.execute(e);
             }
         }
@@ -31,7 +31,7 @@ public class EventEmitter {
         Method[] methods = l.getClass().getMethods();
         for (Method m : methods) {
             EventListener evn = m.getAnnotation(EventListener.class);
-            if(evn == null) continue;
+            if (evn == null) continue;
             Class<?> eused;
             if (m.getParameterTypes().length != 1 || !Event.class.isAssignableFrom(eused = m.getParameterTypes()[0])) {
                 server.logger.err(String.format("Method %s() in class %s has incorrect parameters", m.getName(), l.getClass().getName()));
@@ -48,7 +48,7 @@ public class EventEmitter {
                 }
             };
             List<Executor> lnr = lnrs.get(eused);
-            if(lnr == null) {
+            if (lnr == null) {
                 lnr = new ArrayList<>();
             }
             lnr.add(e);

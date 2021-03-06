@@ -2,24 +2,17 @@ package dev.floffah.gamermode.server.socket;
 
 import dev.floffah.gamermode.server.Server;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SocketManager {
-    int port = 25565;
-
-    ServerSocket sock;
-
     public Server server;
-
-    ExecutorService pool = Executors.newCachedThreadPool();
-
     public Map<UUID, SocketConnection> verified = new HashMap<>();
     public List<SocketConnection> newconns = new LinkedList<>();
+    int port = 25565;
+    ServerSocket sock;
 
     public SocketManager(Server server) {
         this.server = server;
@@ -32,7 +25,7 @@ public class SocketManager {
 
     public void listen() {
         Runnable listener = () -> {
-            for( ; ;) {
+            for (; ; ) {
                 try {
                     server.logger.info("Accepting connection...");
                     Socket csock = sock.accept();
@@ -45,14 +38,14 @@ public class SocketManager {
             }
         };
 
-        pool.execute(listener);
+        server.pool.execute(listener);
     }
 
     public void stop() throws IOException {
 //        in.close();
 //        out.close();
 //        csock.close();
-        pool.shutdown();
+        server.pool.shutdown();
         sock.close();
     }
 }

@@ -2,6 +2,7 @@ package dev.floffah.gamermode.server.packet.connection;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import dev.floffah.gamermode.chat.Component;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.util.Strings;
@@ -9,9 +10,9 @@ import dev.floffah.gamermode.util.Strings;
 import java.io.IOException;
 
 public class LoginDisconnect extends BasePacket {
-    String chat;
+    Component chat;
 
-    public LoginDisconnect(String chat) {
+    public LoginDisconnect(Component chat) {
         super("LoginDisconnect", 0x00, PacketType.OUTBOUND);
         this.chat = chat;
     }
@@ -20,7 +21,8 @@ public class LoginDisconnect extends BasePacket {
     public ByteArrayDataOutput buildOutput() throws IOException {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        Strings.writeUTF(chat, out);
+        conn.main.server.logger.info(chat.toString());
+        Strings.writeUTF(chat.toString(), out);
 
         return out;
     }

@@ -11,6 +11,10 @@ public class ChatColors {
         return message.replace(replacer, COLOR_CHAR);
     }
 
+    public static String legacyBasic(char replacer, String message) {
+        return message.replace(Character.toString(replacer), "\\u00A7");
+    }
+
     public static Component translateLegacy(String message, char colorchar) {
         if (message.contains("&")) message = legacyAmbersand(message);
         ComponentBuilder b = new ComponentBuilder("");

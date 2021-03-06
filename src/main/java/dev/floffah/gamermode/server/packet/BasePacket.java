@@ -9,9 +9,8 @@ import java.io.IOException;
 public class BasePacket {
     public String name;
     public int id;
-    PacketType type;
-
     public SocketConnection conn;
+    PacketType type;
 
     public BasePacket(String name, int id, PacketType type) {
         this.name = name;

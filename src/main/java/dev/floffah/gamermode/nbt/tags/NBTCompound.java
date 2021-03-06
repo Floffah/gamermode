@@ -62,8 +62,7 @@ public class NBTCompound extends NBTTag {
             out.write(b);
         }
 
-        for (String s : this.data.keySet()) {
-            NBTTag tag = this.data.get(s);
+        for (NBTTag tag : this.data.values()) {
             out.writeByte(tag.type.ordinal());
             tag.toByteArray(out, true);
         }

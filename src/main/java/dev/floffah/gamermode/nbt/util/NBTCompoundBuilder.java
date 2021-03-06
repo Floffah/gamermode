@@ -43,7 +43,7 @@ public class NBTCompoundBuilder {
     }
 
     public NBTCompoundBuilder(NBTListBuilder parent) {
-        parentmode = true;
+        parentmode = false;
         listmode = true;
         listparent = parent;
         this.name = "";
@@ -168,8 +168,8 @@ public class NBTCompoundBuilder {
      * @return the parent nbt list builder
      */
     public NBTListBuilder listBuild() {
-        if (parentmode && listmode) {
-            listparent.put(cmp);
+        if (!parentmode && listmode) {
+            listparent.lst.value.add(cmp);
             return listparent;
         }
         return null;

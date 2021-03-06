@@ -11,7 +11,7 @@ public class Strings {
         int len = VarInt.readVarInt(in);
         byte[] bytes = new byte[len];
 
-        for(int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             bytes[i] = in.readByte();
         }
 

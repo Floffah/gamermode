@@ -6,11 +6,11 @@ import com.google.common.io.ByteArrayDataOutput;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NBTList extends NBTTag {
-    public Set<NBTTag> value = new HashSet<>();
+    public List<NBTTag> value = new ArrayList<>();
     public NBTType valtype;
     public int vallen = -1;
 
@@ -96,7 +96,7 @@ public class NBTList extends NBTTag {
         return vallen;
     }
 
-    public void setValue(Set<NBTTag> value) {
+    public void setValue(List<NBTTag> value) {
         this.value = value;
     }
 }

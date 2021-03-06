@@ -4,16 +4,15 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
+import dev.floffah.gamermode.server.socket.ConnectionState;
 import dev.floffah.gamermode.util.Strings;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class LoginSuccess extends BasePacket {
@@ -49,6 +48,8 @@ public class LoginSuccess extends BasePacket {
         out.writeLong(uuid.getLeastSignificantBits());
 
         Strings.writeUTF(conn.playername, out);
+
+        conn.state = ConnectionState.PLAY;
 
         return out;
     }

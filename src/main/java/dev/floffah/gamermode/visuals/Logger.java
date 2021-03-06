@@ -6,19 +6,39 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.sql.Timestamp;
 
 public class Logger {
+    public static Logger inst;
+
     Server main;
 
     public Logger(Server main) {
         this.main = main;
+        Logger.inst = this;
     }
 
     public void info(String... message) {
         log(getFormat("info") + String.join(" ", message) + "\n");
     }
 
-    public void err(String ...message) {
+    public void warn(String... message) {
+        log(getFormat("warn") + String.join(" ", message) + "\n");
+    }
+
+    public void debug(String... message) {
+        if (main.conf.debug.debugLog) {
+            log(getFormat("debug") + String.join(" ", message) + "\n");
+        }
+    }
+
+    public void debugwarn(String... message) {
+        if (main.conf.debug.debugLog) {
+            log(getFormat("debugwarn") + String.join(" ", message) + "\n");
+        }
+    }
+
+    public void err(String... message) {
         err(true, message);
     }
+
     public void err(boolean dosout, String... message) {
         log(getFormat("err") + String.join(" ", message) + "\n", dosout);
     }
@@ -45,6 +65,6 @@ public class Logger {
         if (main.win != null && main.win.loaded) {
             main.win.log(message);
         }
-        if(dosout) System.out.print(message);
+        if (dosout) System.out.print(message);
     }
 }

@@ -9,6 +9,7 @@ import dev.floffah.gamermode.server.socket.SocketConnection;
 import dev.floffah.gamermode.server.socket.SocketManager;
 import dev.floffah.gamermode.visuals.Logger;
 import dev.floffah.gamermode.visuals.gui.GuiWindow;
+import dev.floffah.gamermode.world.WorldManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +18,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Server {
     public static Server server;
@@ -32,8 +37,14 @@ public class Server {
     public int protver = 754;
     public KeyPairGenerator kpg;
     public File confile;
+    public String parent;
+    public Path datadir;
+
+    public ExecutorService pool;
+    public ScheduledExecutorService scheduler;
 
     SocketManager sock;
+    public WorldManager wm;
 
     public Server(String[] args) {
         Server.server = this;
@@ -45,7 +56,7 @@ public class Server {
         events = new EventEmitter(this);
 
         om = new ObjectMapper(new YAMLFactory());
-        String parent = null;
+        parent = null;
         try {
             parent = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent().toUri().getPath();
             if (this.args.contains("-usewd")) {
@@ -60,6 +71,15 @@ public class Server {
         } catch (URISyntaxException | IOException e) {
             logger.printStackTrace(e);
         }
+
+        datadir = Path.of(parent, "data");
+        datadir.toFile().mkdirs();
+
+        pool = Executors.newFixedThreadPool(conf.performance.poolSize);
+        scheduler = Executors.newScheduledThreadPool(conf.performance.scheduledPoolSize);
+
+        wm = new WorldManager(this);
+        wm.startUp();
 
         try {
             kpg = KeyPairGenerator.getInstance("RSA");
@@ -91,8 +111,10 @@ public class Server {
 
         logger.info("Goodbye!");
 
-        for (SocketConnection conn : sock.verified.values()) {
-            conn.close();
+        if (this.sock != null) {
+            for (SocketConnection conn : sock.verified.values()) {
+                conn.close();
+            }
         }
 
         win.stop();

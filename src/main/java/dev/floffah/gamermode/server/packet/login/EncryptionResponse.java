@@ -1,10 +1,10 @@
 package dev.floffah.gamermode.server.packet.login;
 
 import com.google.common.io.ByteArrayDataInput;
+import dev.floffah.gamermode.chat.ChatColors;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.server.packet.connection.LoginDisconnect;
-import dev.floffah.gamermode.util.Chat;
 import dev.floffah.gamermode.util.VarInt;
 
 import javax.crypto.BadPaddingException;
@@ -52,8 +52,8 @@ public class EncryptionResponse extends BasePacket {
             conn.send(new LoginSuccess());
             conn.send(new JoinGame());
         } else {
-            conn.send(new LoginDisconnect(Chat.translateToBasic('&', "&cClient failed encryption request.")));
-            conn.close();
+            conn.send(new LoginDisconnect(ChatColors.translateLegacy("Client failed encryption request.", '&')));
+            //conn.close();
         }
     }
 }

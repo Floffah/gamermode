@@ -1,0 +1,14 @@
+---
+configVersion: 1001
+players:
+  max: 50
+info:
+  motd: "Minecraft server"
+worlds:
+  worldname: "world"
+  renderDistance: 8
+debug:
+  debugLog: true
+performance:
+  poolSize: 10
+  scheduledPoolSize: 10

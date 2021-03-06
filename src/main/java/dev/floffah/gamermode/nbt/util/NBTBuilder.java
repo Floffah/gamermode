@@ -26,6 +26,7 @@ public class NBTBuilder {
     }
 
     public NBTObject build() {
+        obj = new NBTObject();
         obj.setRoot(root.cmp);
         root = null;
         return obj;

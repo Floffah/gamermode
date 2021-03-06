@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class LoginStart extends BasePacket {
     public LoginStart() {
-        super("LoginStart", 0x00,PacketType.INBOUND);
+        super("LoginStart", 0x00, PacketType.INBOUND);
     }
 
     @Override
