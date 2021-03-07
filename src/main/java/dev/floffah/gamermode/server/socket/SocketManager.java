@@ -12,7 +12,7 @@ public class SocketManager {
     public Map<UUID, SocketConnection> verified = new HashMap<>();
     public List<SocketConnection> newconns = new LinkedList<>();
     int port = 25565;
-    ServerSocket sock;
+    public ServerSocket sock;
 
     public SocketManager(Server server) {
         this.server = server;

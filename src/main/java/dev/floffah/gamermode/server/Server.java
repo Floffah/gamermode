@@ -5,11 +5,13 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import dev.floffah.gamermode.config.Config;
 import dev.floffah.gamermode.events.EventEmitter;
 import dev.floffah.gamermode.events.server.ShutdownEvent;
+import dev.floffah.gamermode.server.cache.CacheProvider;
 import dev.floffah.gamermode.server.socket.SocketConnection;
 import dev.floffah.gamermode.server.socket.SocketManager;
 import dev.floffah.gamermode.visuals.Logger;
 import dev.floffah.gamermode.visuals.gui.GuiWindow;
 import dev.floffah.gamermode.world.WorldManager;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +42,7 @@ public class Server {
     public File confile;
     public String parent;
     public Path datadir;
+    public CacheProvider cache;
 
     public ExecutorService pool;
     public ScheduledExecutorService scheduler;
@@ -51,6 +55,8 @@ public class Server {
         this.args = Arrays.asList(args);
         logger = new Logger(this);
         win = GuiWindow.start(this);
+
+        Security.addProvider(new BouncyCastleProvider());
 
         logger.info(String.format("Running on Java version %s on %s", System.getProperty("java.version"), System.getProperty("os.name")));
         events = new EventEmitter(this);
@@ -78,12 +84,15 @@ public class Server {
         pool = Executors.newFixedThreadPool(conf.performance.poolSize);
         scheduler = Executors.newScheduledThreadPool(conf.performance.scheduledPoolSize);
 
+        cache = new CacheProvider(this);
+
         wm = new WorldManager(this);
         wm.startUp();
 
         try {
-            kpg = KeyPairGenerator.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
+            kpg = KeyPairGenerator.getInstance("RSA", "BC");
+            kpg.initialize(1024);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             logger.printStackTrace(e);
         }
 

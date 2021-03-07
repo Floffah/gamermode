@@ -3,8 +3,13 @@ package dev.floffah.gamermode.server.socket;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import dev.floffah.gamermode.chat.ChatColors;
+import dev.floffah.gamermode.chat.Component;
+import dev.floffah.gamermode.player.Player;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.Translator;
+import dev.floffah.gamermode.server.packet.connection.Disconnect;
+import dev.floffah.gamermode.server.packet.connection.LoginDisconnect;
 import dev.floffah.gamermode.util.Bytes;
 import dev.floffah.gamermode.util.VarInt;
 import org.awaitility.core.ConditionTimeoutException;
@@ -12,9 +17,11 @@ import org.awaitility.core.ConditionTimeoutException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.security.KeyPair;
+import java.security.MessageDigest;
 import java.util.Arrays;
 
 import static org.awaitility.Awaitility.await;
@@ -27,13 +34,17 @@ public class SocketConnection {
     public int protver;
     public String addrused;
     public int portused;
-    public String playername;
     public byte[] verifytoken = null;
     public boolean encrypted = false;
     public KeyPair kp;
-    public byte[] ssecret;
-    public Cipher decryptc;
-    public Cipher encryptc;
+    public SecretKey secret;
+    public Cipher eciph;
+    public Cipher dciph;
+    public MessageDigest digest;
+    public Player player;
+    public String session;
+    public String hash;
+    public String prox;
     DataInputStream in;
     Socket sock;
     DataOutputStream out;
@@ -122,46 +133,46 @@ public class SocketConnection {
         send(p, false);
     }
 
+    public void disconnect(String message) {
+        Component reason = ChatColors.translateLegacy(message, '&');
+        disconnect(reason);
+    }
+
+    public void disconnect(Component reason) {
+        try {
+            if(state == ConnectionState.PLAY) {
+                send(new Disconnect(reason));
+            } else if(state == ConnectionState.LOGIN) {
+                send(new LoginDisconnect(reason));
+            }
+            close();
+        } catch (IOException e) {
+            main.server.logger.printStackTrace(e);
+        }
+    }
+
     public void send(BasePacket p, boolean disableEncryption) throws IOException {
         p.conn = this;
         ByteArrayDataOutput dat = p.buildOutput();
         ByteArrayDataOutput prc = ByteStreams.newDataOutput();
-//        if (encrypted && !disableEncryption) {
-//            try {
-//                encryptc.init(Cipher.ENCRYPT_MODE, kp.getPublic());
-//            } catch (Exception e) {
-//                main.server.logger.printStackTrace(e);
-//                return;
-//            }
-//        }
         if (dat != null) {
             String dbgp = "";
             if (this.encrypted && !disableEncryption) {
                 dbgp += "(Encrypted) ";
             }
             main.server.logger.info(String.format("%sSending packet of name %s and id %s (current length %s)", dbgp, p.name, p.id, dat.toByteArray().length), Arrays.toString(dat.toByteArray()));
-//            if (encrypted) {
-//                VarInt.writeEncryptedVarInt(out, dat.toByteArray().length + 1, encryptc);
-//                VarInt.writeEncryptedVarInt(out, p.id, encryptc);
-//            } else {
             VarInt.writeVarInt(prc, dat.toByteArray().length + 1);
             VarInt.writeVarInt(prc, p.id);
-            //}
-            for (byte d : dat.toByteArray()) {
-//                if (encrypted) {
-//                    try {
-//                        out.writeByte(encryptc.doFinal(Bytes.byteToArray(d))[0]);
-//                    } catch (IllegalBlockSizeException | BadPaddingException e) {
-//                        main.server.logger.printStackTrace(e);
-//                    }
-//                } else {
-                prc.writeByte(d);
-                //}
-            }
+            prc.write(dat.toByteArray());
             byte[] sent;
             if (encrypted && !disableEncryption) {
                 try {
-                    sent = encryptc.update(prc.toByteArray());
+                    byte[] ecsend = eciph.update(prc.toByteArray());
+                    if (ecsend != null) sent = ecsend;
+                    else {
+                        main.server.logger.info(String.format("Could not send packet of name %s and id %s because encryption was null", p.name, p.id));
+                        return;
+                    }
                 } catch (Exception e) {
                     main.server.logger.printStackTrace(e);
                     return;
@@ -169,14 +180,6 @@ public class SocketConnection {
             } else {
                 sent = prc.toByteArray();
             }
-//            if(encrypted && !disableEncryption) {
-//                try {
-//                    sent = encryptc.update();
-//                } catch (Exception e) {
-//                    main.server.logger.printStackTrace(e);
-//                    return;
-//                }
-//            }
             out.write(sent);
 
             main.server.logger.info(String.format("%sSent packet of name %s and id %s of length %s", dbgp, p.name, p.id, sent.length), Arrays.toString(sent));
@@ -204,8 +207,8 @@ public class SocketConnection {
                 int len;
                 int id;
                 if (encrypted) {
-                    len = VarInt.readEncryptedVarInt(in, decryptc);
-                    id = VarInt.readEncryptedVarInt(in, decryptc);
+                    len = VarInt.readEncryptedVarInt(in, dciph);
+                    id = VarInt.readEncryptedVarInt(in, dciph);
                 } else {
                     len = VarInt.readVarInt(in);
                     id = VarInt.readVarInt(in);
@@ -215,11 +218,11 @@ public class SocketConnection {
                 for (int i = 0; i < len - 1; i++) {
                     try {
                         if (encrypted) {
-                            data[i] = decryptc.doFinal(Bytes.byteToArray(in.readByte()))[0];
+                            data[i] = dciph.update(Bytes.byteToArray(in.readByte()))[0];
                         } else {
                             data[i] = in.readByte();
                         }
-                    } catch (EOFException | BadPaddingException | IllegalBlockSizeException e) {
+                    } catch (EOFException e) {
                         continue;
                     }
                 }

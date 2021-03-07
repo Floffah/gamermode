@@ -2,6 +2,7 @@ package dev.floffah.gamermode.server.packet.login;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import dev.floffah.gamermode.player.Player;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.server.socket.ConnectionState;
@@ -24,30 +25,12 @@ public class LoginSuccess extends BasePacket {
     public ByteArrayDataOutput buildOutput() throws IOException {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + conn.playername);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
+        conn.player.profile.authenticate();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        StringBuilder content = new StringBuilder();
-        String currentline;
-        while ((currentline = in.readLine()) != null) {
-            content.append(currentline);
-        }
-        in.close();
-        con.disconnect();
+        out.writeLong(conn.player.uuid.getMostSignificantBits());
+        out.writeLong(conn.player.uuid.getLeastSignificantBits());
 
-        System.out.println(content);
-
-        JSONObject obj = new JSONObject(content.toString());
-        String unformatted = obj.getString("id");
-        String formatted = String.format("%s-%s-%s-%s-%s", unformatted.substring(0, 7), unformatted.substring(7, 11), unformatted.substring(11, 15), unformatted.substring(15, 20), unformatted.substring(20));
-        UUID uuid = UUID.fromString(formatted);
-
-        out.writeLong(uuid.getMostSignificantBits());
-        out.writeLong(uuid.getLeastSignificantBits());
-
-        Strings.writeUTF(conn.playername, out);
+        Strings.writeUTF(conn.player.username, out);
 
         conn.state = ConnectionState.PLAY;
 
