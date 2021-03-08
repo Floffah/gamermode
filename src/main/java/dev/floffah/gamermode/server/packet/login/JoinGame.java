@@ -20,24 +20,24 @@ public class JoinGame extends BasePacket {
     public ByteArrayDataOutput buildOutput() throws IOException {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        out.writeInt(20);
-        out.writeBoolean(false);
-        out.write(((byte) 0) & 0xFF);
-        out.writeByte(-1);
-        VarInt.writeVarInt(out, 1);
-        Strings.writeUTF("minecraft:world", out);
-        conn.main.server.wm.codec.write(out);
+        out.writeInt(20); // entity id
+        out.writeBoolean(false); // is hardcore
+        out.writeByte(0 & 0xff); // gamemode
+        out.writeByte(-1); // previous gamemode
+        VarInt.writeVarInt(out, 1); // world count
+        Strings.writeUTF("minecraft:world", out); // array index 0 of identifier
+        conn.main.server.wm.codec.write(out); // dimension codec
         World defworld = conn.main.server.wm.getDefaultWorld();
-        conn.main.server.wm.getPlainDimType(defworld).write(out);
-        Strings.writeUTF(defworld.name, out);
-        Long seed = 2398456723252352352L;
-        out.writeLong(seed.hashCode());
-        VarInt.writeVarInt(out, conn.main.server.conf.players.max);
-        VarInt.writeVarInt(out, conn.main.server.conf.worlds.renderDistance);
-        out.writeByte(Bytes.bool(false));
-        out.writeByte(Bytes.bool(true));
-        out.writeByte(Bytes.bool(true));
-        out.writeByte(Bytes.bool(false));
+        conn.main.server.wm.getPlainDimType(defworld).write(out); // dimension
+        Strings.writeUTF(defworld.name, out); // world name
+        long seed = 2398456723252352352L;
+        out.writeLong(seed); // hashed seed
+        VarInt.writeVarInt(out, conn.main.server.conf.players.max); // max players
+        VarInt.writeVarInt(out, conn.main.server.conf.worlds.renderDistance); // render distance
+        out.writeByte(Bytes.bool(false)); // reduced debug info
+        out.writeByte(Bytes.bool(true)); // enable respawn screen
+        out.writeByte(Bytes.bool(true)); // is debug
+        out.writeByte(Bytes.bool(false)); // is flat
 
         return out;
     }

@@ -27,7 +27,7 @@ public class Overworld extends World {
         this.logicalHeight = 256;
         this.coordinate_scale = 1.0;
         this.ultrawarm = false;
-        this.hasCeiling = true;
+        this.hasCeiling = false;
 
         this.registerBiome(new Ocean());
         this.registerBiome(new Plains());

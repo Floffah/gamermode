@@ -131,37 +131,46 @@ public class WorldManager {
 
         int bindex = 0;
         for (Biome b : allBiomes) {
-            NBTCompoundBuilder biom = new NBTCompoundBuilder(lst);
+            NBTCompoundBuilder biom = new NBTCompoundBuilder(gen);
 
-            biom.
+            NBTCompoundBuilder element = biom.
                     setString("name", b.name)
-                    .setInt("id", index)
-                    .startCompound("element")
-                    .setString("precipitation", b.precipitation.name)
-                    .startCompound("effects")
-                    .setInt("sky_color", b.skyColor)
+                    .setInt("id", bindex)
+                    .startCompound("element");
+
+            NBTCompoundBuilder effects = element.setString("precipitation", b.precipitation.name)
+                    .startCompound("effects");
+            NBTCompoundBuilder moodsound = effects.setInt("sky_color", b.skyColor)
                     .setInt("water_fog_color", b.waterFogColor)
                     .setInt("fog_color", b.fogColor)
                     .setInt("water_color", b.waterColor)
-                    .startCompound("mood_sound")
-                    .setInt("mood_sound", b.moodSoundTickDelay)
+                    .startCompound("mood_sound");
+
+            moodsound.setInt("mood_sound", b.moodSoundTickDelay)
                     .setDouble("offset", b.moodSoundOffset)
                     .setString("sound", b.moodSound.name)
-                    .setInt("block_search_extend", b.moodSoundBlockSearchExtent)
-                    .build() // mood_sound
-                    .build() // effects
-                    .setFloat("depth", b.depth)
+                    .setInt("block_search_extent", b.moodSoundBlockSearchExtent);
+
+            moodsound.build();
+            effects.build();
+
+            element.setFloat("depth", b.depth)
                     .setFloat("temperature", b.temperature)
                     .setFloat("scale", b.scale)
                     .setFloat("downfall", b.downfall)
-                    .setString("category", b.category.name)
-                    .build() // element
-                    .listBuild();
+                    .setString("category", b.category.name);
 
-            index++;
+            element.build();
+            biom.listBuild();
+
+            bindex++;
         }
 
+        lst.build();
+        gen.build();
+        cb.build();
+        gn.build();
 
-        return lst.build().build().end().build();
+        return main.end().build();
     }
 }

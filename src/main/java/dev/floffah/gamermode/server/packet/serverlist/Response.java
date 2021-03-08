@@ -20,8 +20,8 @@ public class Response extends BasePacket {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
         String motd = conn.main.server.conf.info.motd;
-        if (conn.protver < conn.main.server.protver) {
-            motd = "&cClient version out of date";
+        if (conn.protver >= 0 && conn.protver < conn.main.server.protver) {
+            motd = String.format("&cClient version out of date (%s@C %s@S)", conn.protver, conn.main.server.protver);
         }
 
         Strings.writeUTF(String.format("""
