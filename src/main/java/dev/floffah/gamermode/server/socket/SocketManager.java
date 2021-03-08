@@ -11,8 +11,8 @@ public class SocketManager {
     public Server server;
     public Map<UUID, SocketConnection> verified = new HashMap<>();
     public List<SocketConnection> newconns = new LinkedList<>();
-    int port = 25565;
     public ServerSocket sock;
+    int port = 25565;
 
     public SocketManager(Server server) {
         this.server = server;

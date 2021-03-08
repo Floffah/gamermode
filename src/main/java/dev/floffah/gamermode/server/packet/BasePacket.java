@@ -2,6 +2,7 @@ package dev.floffah.gamermode.server.packet;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import dev.floffah.gamermode.events.network.PacketSentEvent;
 import dev.floffah.gamermode.server.socket.SocketConnection;
 
 import java.io.IOException;
@@ -23,5 +24,9 @@ public class BasePacket {
 
     public ByteArrayDataOutput buildOutput() throws IOException {
         return null;
+    }
+
+    public void postSend(PacketSentEvent e) throws IOException {
+
     }
 }

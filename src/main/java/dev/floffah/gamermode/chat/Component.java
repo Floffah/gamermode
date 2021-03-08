@@ -1,6 +1,5 @@
 package dev.floffah.gamermode.chat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

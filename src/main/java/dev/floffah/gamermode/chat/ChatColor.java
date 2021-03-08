@@ -1,7 +1,5 @@
 package dev.floffah.gamermode.chat;
 
-import java.awt.*;
-
 public enum ChatColor {
     BLACK("black", "0", "#000000"),
     DARK_BLUE("dark_blue", "1", "#0000aa"),

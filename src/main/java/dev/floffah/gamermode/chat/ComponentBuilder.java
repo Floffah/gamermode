@@ -2,7 +2,6 @@ package dev.floffah.gamermode.chat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * ComponentBuilder inspired by md_5s implementation

@@ -17,7 +17,7 @@ public class ComponentSerializer {
         if (c.underlined) json.put("underlined", "true");
         if (c.strikethrough) json.put("strikethrough", "true");
         if (c.obfuscated) json.put("obfuscated", "true");
-        if(c.color != null) json.put("color", c.color.name);
+        if (c.color != null) json.put("color", c.color.name);
     }
 
     @Override

@@ -2,6 +2,8 @@ package dev.floffah.gamermode.server.packet.login;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import dev.floffah.gamermode.events.network.PacketSentEvent;
+import dev.floffah.gamermode.events.player.login.PlayerJoinEvent;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.util.Bytes;
@@ -40,5 +42,23 @@ public class JoinGame extends BasePacket {
         out.writeByte(Bytes.bool(false)); // is flat
 
         return out;
+    }
+
+    @Override
+    public void postSend(PacketSentEvent e) throws IOException {
+        PlayerJoinEvent joine = new PlayerJoinEvent(conn.player);
+        conn.main.server.events.execute(joine);
+        if(joine.isCancelled()) {
+            String reason = "Kicked";
+            if (joine.getCancelReason() != null) {
+                reason = joine.getCancelReason();
+            }
+            conn.disconnect(reason);
+            return;
+        }
+
+        ByteArrayDataOutput brandout = ByteStreams.newDataOutput();
+        Strings.writeUTF("gamermode", brandout);
+        conn.player.sendPluginMessage("minecraft:brand", brandout);
     }
 }

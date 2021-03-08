@@ -46,9 +46,8 @@ public class Server {
 
     public ExecutorService pool;
     public ScheduledExecutorService scheduler;
-
-    SocketManager sock;
     public WorldManager wm;
+    SocketManager sock;
 
     public Server(String[] args) {
         Server.server = this;

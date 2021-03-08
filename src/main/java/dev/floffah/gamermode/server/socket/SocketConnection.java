@@ -5,6 +5,8 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import dev.floffah.gamermode.chat.ChatColors;
 import dev.floffah.gamermode.chat.Component;
+import dev.floffah.gamermode.events.network.PacketSendingEvent;
+import dev.floffah.gamermode.events.network.PacketSentEvent;
 import dev.floffah.gamermode.player.Player;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.Translator;
@@ -14,9 +16,7 @@ import dev.floffah.gamermode.util.Bytes;
 import dev.floffah.gamermode.util.VarInt;
 import org.awaitility.core.ConditionTimeoutException;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
@@ -140,9 +140,9 @@ public class SocketConnection {
 
     public void disconnect(Component reason) {
         try {
-            if(state == ConnectionState.PLAY) {
+            if (state == ConnectionState.PLAY) {
                 send(new Disconnect(reason));
-            } else if(state == ConnectionState.LOGIN) {
+            } else if (state == ConnectionState.LOGIN) {
                 send(new LoginDisconnect(reason));
             }
             close();
@@ -154,6 +154,9 @@ public class SocketConnection {
     public void send(BasePacket p, boolean disableEncryption) throws IOException {
         p.conn = this;
         ByteArrayDataOutput dat = p.buildOutput();
+        PacketSendingEvent event = new PacketSendingEvent(p, dat);
+        main.server.events.execute(event);
+        if (event.isCancelled()) return;
         ByteArrayDataOutput prc = ByteStreams.newDataOutput();
         if (dat != null) {
             String dbgp = "";
@@ -184,6 +187,9 @@ public class SocketConnection {
 
             main.server.logger.info(String.format("%sSent packet of name %s and id %s of length %s", dbgp, p.name, p.id, sent.length), Arrays.toString(sent));
             out.flush();
+            PacketSentEvent sente = new PacketSentEvent(p, prc);
+            p.postSend(sente);
+            main.server.events.execute(sente);
         }
     }
 

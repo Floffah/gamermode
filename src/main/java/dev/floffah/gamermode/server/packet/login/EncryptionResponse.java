@@ -1,11 +1,8 @@
 package dev.floffah.gamermode.server.packet.login;
 
 import com.google.common.io.ByteArrayDataInput;
-import dev.floffah.gamermode.chat.ChatColor;
-import dev.floffah.gamermode.chat.ComponentBuilder;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
-import dev.floffah.gamermode.server.packet.connection.Disconnect;
 import dev.floffah.gamermode.util.VarInt;
 
 import javax.crypto.BadPaddingException;

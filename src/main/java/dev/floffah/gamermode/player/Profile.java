@@ -1,16 +1,15 @@
 package dev.floffah.gamermode.player;
 
 import org.json.JSONArray;
-import org.json.JSONML;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.UUID;
 
 public class Profile {
@@ -74,7 +73,7 @@ public class Profile {
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         StringBuilder content = new StringBuilder();
         String current;
-        while((current = in.readLine()) != null) {
+        while ((current = in.readLine()) != null) {
             content.append(current);
         }
         in.close();
