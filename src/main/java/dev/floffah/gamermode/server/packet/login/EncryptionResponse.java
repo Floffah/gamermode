@@ -5,12 +5,11 @@ import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.util.VarInt;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -102,6 +101,10 @@ public class EncryptionResponse extends BasePacket {
         conn.prox = URLEncoder.encode(addr.getHostAddress(), StandardCharsets.UTF_8);
 
         conn.encrypted = true;
+
+        conn.in = new DataInputStream(new CipherInputStream(conn.sock.getInputStream(), conn.dciph));
+        conn.out = new DataOutputStream(new CipherOutputStream(conn.sock.getOutputStream(), conn.eciph));
+
         conn.send(new LoginSuccess());
         conn.send(new JoinGame());
     }

@@ -6,6 +6,7 @@ import dev.floffah.gamermode.events.network.PacketSentEvent;
 import dev.floffah.gamermode.events.player.login.PlayerJoinEvent;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
+import dev.floffah.gamermode.server.packet.play.misc.ServerDifficulty;
 import dev.floffah.gamermode.util.Bytes;
 import dev.floffah.gamermode.util.Strings;
 import dev.floffah.gamermode.util.VarInt;
@@ -15,7 +16,7 @@ import java.io.IOException;
 
 public class JoinGame extends BasePacket {
     public JoinGame() {
-        super("LoginJoinGame", 0x24, PacketType.OUTBOUND);
+        super("JoinGame", 0x24, PacketType.OUTBOUND);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class JoinGame extends BasePacket {
     public void postSend(PacketSentEvent e) throws IOException {
         PlayerJoinEvent joine = new PlayerJoinEvent(conn.player);
         conn.main.server.events.execute(joine);
-        if(joine.isCancelled()) {
+        if (joine.isCancelled()) {
             String reason = "Kicked";
             if (joine.getCancelReason() != null) {
                 reason = joine.getCancelReason();
@@ -58,7 +59,9 @@ public class JoinGame extends BasePacket {
         }
 
         ByteArrayDataOutput brandout = ByteStreams.newDataOutput();
-        Strings.writeUTF("gamermode", brandout);
+        //Strings.writeUTF("gamermode", brandout);
+        brandout.writeUTF("gamermode");
         conn.player.sendPluginMessage("minecraft:brand", brandout);
+        conn.send(new ServerDifficulty());
     }
 }

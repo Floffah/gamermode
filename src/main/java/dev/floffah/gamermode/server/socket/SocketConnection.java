@@ -12,7 +12,6 @@ import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.Translator;
 import dev.floffah.gamermode.server.packet.connection.Disconnect;
 import dev.floffah.gamermode.server.packet.connection.LoginDisconnect;
-import dev.floffah.gamermode.util.Bytes;
 import dev.floffah.gamermode.util.VarInt;
 import org.awaitility.core.ConditionTimeoutException;
 
@@ -45,9 +44,9 @@ public class SocketConnection {
     public String session;
     public String hash;
     public String prox;
-    DataInputStream in;
-    Socket sock;
-    DataOutputStream out;
+    public DataInputStream in;
+    public Socket sock;
+    public DataOutputStream out;
     long lastpacket = System.currentTimeMillis();
 
     boolean stopcloser = false;
@@ -61,9 +60,7 @@ public class SocketConnection {
         in = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
         this.state = ConnectionState.HANDSHAKE;
 
-        Runnable checkclosed = this::checkClosed;
-
-        main.server.pool.execute(checkclosed);
+        main.server.pool.execute(this::checkClosed);
 
         Runnable reader = () -> {
             try {
@@ -82,21 +79,22 @@ public class SocketConnection {
                 break;
             }
             try {
-                await().until(() -> lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed());
-            } catch (ConditionTimeoutException e) {
+                await().until(() -> (lastpacket <= (System.currentTimeMillis() - 10000) && in.available() <= 0) || sock.isClosed());
+
+                while (stopcloser || (lastpacket <= (System.currentTimeMillis() - 10000) && in.available() <= 0) || sock.isClosed()) {
+                    if (stopcloser) {
+                        break;
+                    }
+                    try {
+                        close();
+                        closed = true;
+                        break;
+                    } catch (IOException e) {
+                        main.server.logger.printStackTrace(e);
+                    }
+                }
+            } catch (ConditionTimeoutException | IOException e) {
                 continue;
-            }
-            while (stopcloser || lastpacket <= (System.currentTimeMillis() - 10000) || sock.isClosed()) {
-                if (stopcloser) {
-                    break;
-                }
-                try {
-                    close();
-                    closed = true;
-                    break;
-                } catch (IOException e) {
-                    main.server.logger.printStackTrace(e);
-                }
             }
             if (stopcloser) {
                 break;
@@ -167,26 +165,11 @@ public class SocketConnection {
             VarInt.writeVarInt(prc, dat.toByteArray().length + 1);
             VarInt.writeVarInt(prc, p.id);
             prc.write(dat.toByteArray());
-            byte[] sent;
-            if (encrypted && !disableEncryption) {
-                try {
-                    byte[] ecsend = eciph.update(prc.toByteArray());
-                    if (ecsend != null) sent = ecsend;
-                    else {
-                        main.server.logger.info(String.format("Could not send packet of name %s and id %s because encryption was null", p.name, p.id));
-                        return;
-                    }
-                } catch (Exception e) {
-                    main.server.logger.printStackTrace(e);
-                    return;
-                }
-            } else {
-                sent = prc.toByteArray();
-            }
+            byte[] sent = prc.toByteArray();
             out.write(sent);
+            out.flush();
 
             main.server.logger.info(String.format("%sSent packet of name %s and id %s of length %s", dbgp, p.name, p.id, sent.length), Arrays.toString(sent));
-            out.flush();
             PacketSentEvent sente = new PacketSentEvent(p, prc);
             p.postSend(sente);
             main.server.events.execute(sente);
@@ -202,40 +185,38 @@ public class SocketConnection {
                 break;
             }
             try {
-                await().until(() -> in.available() > 0);
+                await().until(() -> in == null || in.available() > 0);
             } catch (ConditionTimeoutException e) {
                 continue;
             }
+            if (in == null) break;
             while (stopreader || (in != null && in.available() > 0)) {
                 if (stopreader) {
                     break;
                 }
-                int len;
-                int id;
-                if (encrypted) {
-                    len = VarInt.readEncryptedVarInt(in, dciph);
-                    id = VarInt.readEncryptedVarInt(in, dciph);
-                } else {
-                    len = VarInt.readVarInt(in);
-                    id = VarInt.readVarInt(in);
+
+                int len = VarInt.readVarInt(in);
+                int id = VarInt.readVarInt(in);
+
+                if (len < 1) {
+                    disconnect("&cIncorrect packet length");
                 }
+
                 byte[] data = new byte[len];
 
                 for (int i = 0; i < len - 1; i++) {
                     try {
-                        if (encrypted) {
-                            data[i] = dciph.update(Bytes.byteToArray(in.readByte()))[0];
-                        } else {
-                            data[i] = in.readByte();
-                        }
+                        data[i] = in.readByte();
                     } catch (EOFException e) {
                         continue;
                     }
                 }
+
                 ByteArrayDataInput in = ByteStreams.newDataInput(data);
-                main.server.logger.info(String.valueOf(this.encrypted), String.valueOf(state), Integer.toString(len), Integer.toString(id), Arrays.toString(data));
                 lastpacket = System.currentTimeMillis();
-                Translator.translate(len, id, in, this);
+                BasePacket pk = Translator.identify(id, this);
+                main.server.logger.info(String.valueOf(this.encrypted), pk.name, String.valueOf(state), Integer.toString(len), Integer.toString(id), Arrays.toString(data));
+                pk.process(len, in);
             }
             if (stopreader) {
                 break;

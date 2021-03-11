@@ -15,6 +15,7 @@ public class Config {
 
     public static class ServerInfo {
         public String motd = "Minecraft server";
+        public byte difficulty = 1;
     }
 
     public static class WorldInfo {

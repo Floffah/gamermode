@@ -4,6 +4,7 @@ players:
   max: 50
 info:
   motd: "Minecraft server"
+  difficulty: 1
 worlds:
   worldname: "world"
   renderDistance: 8
