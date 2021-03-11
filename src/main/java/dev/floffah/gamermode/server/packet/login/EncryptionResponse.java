@@ -8,9 +8,7 @@ import dev.floffah.gamermode.util.VarInt;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URLEncoder;
@@ -102,8 +100,12 @@ public class EncryptionResponse extends BasePacket {
 
         conn.encrypted = true;
 
-        conn.in = new DataInputStream(new CipherInputStream(conn.sock.getInputStream(), conn.dciph));
-        conn.out = new DataOutputStream(new CipherOutputStream(conn.sock.getOutputStream(), conn.eciph));
+        conn.fin.enableDecryption(conn.dciph);
+        conn.fout.enableEncryption(conn.eciph);
+//        conn.in = new DataInputStream(new CipherInputStream(new BufferedInputStream(conn.sock.getInputStream()), conn.dciph));
+//        conn.out = new DataOutputStream(new CipherOutputStream(new BufferedOutputStream(conn.sock.getOutputStream()), conn.eciph));
+
+        conn.lastkeepalivereceive = System.currentTimeMillis();
 
         conn.send(new LoginSuccess());
         conn.send(new JoinGame());

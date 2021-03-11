@@ -6,13 +6,16 @@ import dev.floffah.gamermode.events.network.PacketSentEvent;
 import dev.floffah.gamermode.events.player.login.PlayerJoinEvent;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
+import dev.floffah.gamermode.server.packet.play.connection.Keepalive;
 import dev.floffah.gamermode.server.packet.play.misc.ServerDifficulty;
+import dev.floffah.gamermode.server.packet.play.player.PlayerAbillities;
 import dev.floffah.gamermode.util.Bytes;
 import dev.floffah.gamermode.util.Strings;
 import dev.floffah.gamermode.util.VarInt;
 import dev.floffah.gamermode.world.World;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class JoinGame extends BasePacket {
     public JoinGame() {
@@ -58,10 +61,19 @@ public class JoinGame extends BasePacket {
             return;
         }
 
+        conn.main.server.scheduler.scheduleAtFixedRate(() -> {
+            try {
+                conn.send(new Keepalive(0));
+            } catch (IOException e2) {
+                conn.main.server.logger.printStackTrace(e2);
+            }
+        }, 0, 10, TimeUnit.SECONDS);
+
         ByteArrayDataOutput brandout = ByteStreams.newDataOutput();
-        //Strings.writeUTF("gamermode", brandout);
-        brandout.writeUTF("gamermode");
+        Strings.writeUTF("gamermode", brandout);
+        //brandout.writeUTF("gamermode");
         conn.player.sendPluginMessage("minecraft:brand", brandout);
         conn.send(new ServerDifficulty());
+        conn.send(new PlayerAbillities());
     }
 }

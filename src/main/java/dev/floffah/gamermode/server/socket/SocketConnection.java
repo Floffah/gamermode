@@ -44,10 +44,16 @@ public class SocketConnection {
     public String session;
     public String hash;
     public String prox;
+    public FlexibleInputStream fin;
     public DataInputStream in;
     public Socket sock;
+    public FlexibleOutputStream fout;
     public DataOutputStream out;
     long lastpacket = System.currentTimeMillis();
+    public long lastkeepalivesend = 0;
+    public long currentkeepaliveid = 0;
+    public long lastkeepalivereceive = 0;
+    public boolean reading = false;
 
     boolean stopcloser = false;
     boolean stopreader = false;
@@ -56,20 +62,31 @@ public class SocketConnection {
         this.main = main;
         this.sock = sock;
         main.server.logger.info("New connection");
-        out = new DataOutputStream(new BufferedOutputStream(sock.getOutputStream()));
-        in = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
+        fout = new FlexibleOutputStream(new BufferedOutputStream(sock.getOutputStream()));
+        out = new DataOutputStream(fout);
+        fin = new FlexibleInputStream(new BufferedInputStream(sock.getInputStream()));
+        in = new DataInputStream(fin);
+//        out = new DataOutputStream(new BufferedOutputStream(sock.getOutputStream()));
+//        in = new DataInputStream(new BufferedInputStream(sock.getInputStream()));
         this.state = ConnectionState.HANDSHAKE;
 
         main.server.pool.execute(this::checkClosed);
 
-        Runnable reader = () -> {
+        main.server.pool.execute(() -> {
             try {
                 readPackets();
             } catch (InterruptedException | IOException e) {
                 main.server.logger.printStackTrace(e);
             }
-        };
-        main.server.pool.execute(reader);
+        });
+    }
+
+    public boolean recentPacket() {
+        if(state == ConnectionState.PLAY) {
+            return lastkeepalivereceive <= (System.currentTimeMillis() - 30000);
+        } else {
+            return lastpacket <= (System.currentTimeMillis() - 10000);
+        }
     }
 
     public void checkClosed() {
@@ -79,17 +96,17 @@ public class SocketConnection {
                 break;
             }
             try {
-                await().until(() -> (lastpacket <= (System.currentTimeMillis() - 10000) && in.available() <= 0) || sock.isClosed());
+                await().until(() -> (this.recentPacket() && in.available() <= 0) || sock.isClosed());
 
-                while (stopcloser || (lastpacket <= (System.currentTimeMillis() - 10000) && in.available() <= 0) || sock.isClosed()) {
+                while (stopcloser || (this.recentPacket() && in.available() <= 0) || sock.isClosed()) {
                     if (stopcloser) {
                         break;
                     }
                     try {
-                        close();
+                        disconnect("&cKeepalive timeout");
                         closed = true;
                         break;
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         main.server.logger.printStackTrace(e);
                     }
                 }
@@ -177,11 +194,14 @@ public class SocketConnection {
     }
 
     public void readPackets() throws IOException, InterruptedException {
+        reading = true;
         for (; ; ) {
             if (stopreader) {
+                reading = false;
                 break;
             }
             if (in == null || out == null) {
+                reading = false;
                 break;
             }
             try {
@@ -189,9 +209,13 @@ public class SocketConnection {
             } catch (ConditionTimeoutException e) {
                 continue;
             }
-            if (in == null) break;
+            if (in == null) {
+                reading = false;
+                break;
+            }
             while (stopreader || (in != null && in.available() > 0)) {
                 if (stopreader) {
+                    reading = false;
                     break;
                 }
 
@@ -219,6 +243,7 @@ public class SocketConnection {
                 pk.process(len, in);
             }
             if (stopreader) {
+                reading = false;
                 break;
             }
         }

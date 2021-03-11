@@ -39,9 +39,11 @@ public class PluginMessage extends BasePacket {
     @Override
     public void process(int len, ByteArrayDataInput in) throws IOException {
         this.channel = Strings.readUTF(in);
+        System.out.println(this.channel);
         int restlen = 3 + (this.channel.getBytes(StandardCharsets.UTF_8).length);
         byte[] bread = new byte[restlen];
         for (int i = 0; i < restlen; i++) {
+            System.out.println(i + " " + restlen);
             bread[i] = in.readByte();
         }
         this.bytesread = bread;

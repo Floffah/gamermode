@@ -11,7 +11,6 @@ import dev.floffah.gamermode.server.socket.SocketManager;
 import dev.floffah.gamermode.visuals.Logger;
 import dev.floffah.gamermode.visuals.gui.GuiWindow;
 import dev.floffah.gamermode.world.WorldManager;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +20,6 @@ import java.nio.file.Paths;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -55,8 +53,6 @@ public class Server {
         logger = new Logger(this);
         win = GuiWindow.start(this);
 
-        Security.addProvider(new BouncyCastleProvider());
-
         logger.info(String.format("Running on Java version %s on %s", System.getProperty("java.version"), System.getProperty("os.name")));
         events = new EventEmitter(this);
 
@@ -89,9 +85,9 @@ public class Server {
         wm.startUp();
 
         try {
-            kpg = KeyPairGenerator.getInstance("RSA", "BC");
+            kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(1024);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException e) {
             logger.printStackTrace(e);
         }
 
