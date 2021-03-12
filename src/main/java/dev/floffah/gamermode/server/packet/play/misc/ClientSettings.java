@@ -24,6 +24,5 @@ public class ClientSettings extends BasePacket {
         conn.player.settings.colors = in.readByte() == 1;
         conn.player.translateSkinParts(in.readUnsignedByte());
         conn.player.settings.mainHand = VarInt.readVarInt(in);
-        System.out.println(conn.player.settings.toString());
     }
 }

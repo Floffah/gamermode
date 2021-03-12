@@ -67,7 +67,7 @@ public class JoinGame extends BasePacket {
             } catch (IOException e2) {
                 conn.main.server.logger.printStackTrace(e2);
             }
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
 
         ByteArrayDataOutput brandout = ByteStreams.newDataOutput();
         Strings.writeUTF("gamermode", brandout);

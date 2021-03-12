@@ -44,13 +44,11 @@ public class Logger {
     }
 
     public void printStackTrace(Exception e) {
-        if (main.win != null && main.win.loaded) {
-            String[] stack = ExceptionUtils.getStackFrames(e);
-            for (String s : stack) {
-                err(false, s);
-            }
+        String[] stack = ExceptionUtils.getStackFrames(e);
+        for (String s : stack) {
+            err(!main.conf.debug.debugLog, s);
         }
-        e.printStackTrace();
+        if (main.conf.debug.debugLog) e.printStackTrace();
     }
 
     String getFormat(String type) {

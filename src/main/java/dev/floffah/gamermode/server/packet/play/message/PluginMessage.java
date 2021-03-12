@@ -8,6 +8,7 @@ import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.util.Strings;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -39,19 +40,21 @@ public class PluginMessage extends BasePacket {
     @Override
     public void process(int len, ByteArrayDataInput in) throws IOException {
         this.channel = Strings.readUTF(in);
-        System.out.println(this.channel);
-        int restlen = 3 + (this.channel.getBytes(StandardCharsets.UTF_8).length);
+        int restlen = len - 1 - this.channel.getBytes(StandardCharsets.UTF_8).length;
         byte[] bread = new byte[restlen];
         for (int i = 0; i < restlen; i++) {
-            System.out.println(i + " " + restlen);
-            bread[i] = in.readByte();
+            try {
+                bread[i] = in.readByte();
+            } catch (Exception e) {
+                conn.main.server.logger.printStackTrace(e);
+            }
         }
         this.bytesread = bread;
-        if (channel.equals("minecraft:brand")) {
+        if (this.channel.equals("minecraft:brand")) {
             ByteArrayDataInput dat = ByteStreams.newDataInput(bread);
-            String brand = dat.readUTF();
+            String brand = Strings.readUTF(dat);
             conn.player.brand = brand;
-            System.out.println(brand);
+            System.out.println(channel + " " + brand);
         }
         conn.main.server.events.execute(new PluginMessageReceivedEvent(this));
     }

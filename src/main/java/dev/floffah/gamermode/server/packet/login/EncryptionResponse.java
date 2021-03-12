@@ -102,8 +102,6 @@ public class EncryptionResponse extends BasePacket {
 
         conn.fin.enableDecryption(conn.dciph);
         conn.fout.enableEncryption(conn.eciph);
-//        conn.in = new DataInputStream(new CipherInputStream(new BufferedInputStream(conn.sock.getInputStream()), conn.dciph));
-//        conn.out = new DataOutputStream(new CipherOutputStream(new BufferedOutputStream(conn.sock.getOutputStream()), conn.eciph));
 
         conn.lastkeepalivereceive = System.currentTimeMillis();
 

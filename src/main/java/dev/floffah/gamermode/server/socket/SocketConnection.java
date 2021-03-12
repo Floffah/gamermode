@@ -240,7 +240,14 @@ public class SocketConnection {
                 lastpacket = System.currentTimeMillis();
                 BasePacket pk = Translator.identify(id, this);
                 main.server.logger.info(String.valueOf(this.encrypted), pk.name, String.valueOf(state), Integer.toString(len), Integer.toString(id), Arrays.toString(data));
-                pk.process(len, in);
+                try {
+                    pk.process(len, in);
+                } catch (Exception e) {
+                    disconnect(e.getLocalizedMessage());
+                    main.server.logger.printStackTrace(e);
+                    stopreader = true;
+                    break;
+                }
             }
             if (stopreader) {
                 reading = false;
