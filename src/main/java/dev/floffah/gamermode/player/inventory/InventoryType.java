@@ -23,7 +23,8 @@ public enum InventoryType {
     SHULKER_BOX("minecraft:shulker_box"),
     SMOKER("minecraft:smoker"),
     CARTOGRAPHY_TABLE("minecraft:cartography"),
-    STONECUTTER("minecraft:stonecutter");
+    STONECUTTER("minecraft:stonecutter"),
+    PLAYER(null);
 
     public String name;
 

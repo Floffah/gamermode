@@ -17,12 +17,13 @@ public class ClientSettings extends BasePacket {
 
     @Override
     public void process(int len, ByteArrayDataInput in) throws IOException {
-        conn.player.settings = new Player.ClientSettings();
-        conn.player.settings.locale = Strings.readUTF(in);
-        conn.player.settings.viewDistance = in.readByte();
-        conn.player.settings.chatMode = VarInt.readVarInt(in);
-        conn.player.settings.colors = in.readByte() == 1;
+        Player.ClientSettings settings = new Player.ClientSettings();
+        settings.locale = Strings.readUTF(in);
+        settings.viewDistance = in.readByte();
+        settings.chatMode = VarInt.readVarInt(in);
+        settings.colors = in.readByte() == 1;
+        settings.mainHand = VarInt.readVarInt(in);
+        conn.player.setSettings(settings);
         conn.player.translateSkinParts(in.readUnsignedByte());
-        conn.player.settings.mainHand = VarInt.readVarInt(in);
     }
 }

@@ -18,12 +18,12 @@ public class LoginSuccess extends BasePacket {
     public ByteArrayDataOutput buildOutput() throws IOException {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        conn.player.profile.authenticate();
+        conn.player.getProfile().authenticate();
 
-        out.writeLong(conn.player.uuid.getMostSignificantBits());
-        out.writeLong(conn.player.uuid.getLeastSignificantBits());
+        out.writeLong(conn.player.getUniqueId().getMostSignificantBits());
+        out.writeLong(conn.player.getUniqueId().getLeastSignificantBits());
 
-        Strings.writeUTF(conn.player.username, out);
+        Strings.writeUTF(conn.player.getUsername(), out);
 
         conn.state = ConnectionState.PLAY;
 

@@ -30,7 +30,7 @@ public class Profile {
             JSONObject pinf = id.getJSONObject(0);
             String unfid = pinf.getString("id");
             String formatted = String.format("%s-%s-%s-%s-%s", unfid.substring(0, 7), unfid.substring(7, 11), unfid.substring(11, 15), unfid.substring(15, 20), unfid.substring(20));
-            player.uuid = UUID.fromString(formatted);
+            player.uniqueId = UUID.fromString(formatted);
             //JSONObject inf = getInfo(player.uuid);
 //            if (!inf.getString("name").equals(player.username) && !inf.getString("name").equals(pinf.getString("name"))) {
 //                player.conn.close();

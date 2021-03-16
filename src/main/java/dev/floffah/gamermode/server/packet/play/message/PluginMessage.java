@@ -53,7 +53,7 @@ public class PluginMessage extends BasePacket {
         if (this.channel.equals("minecraft:brand")) {
             ByteArrayDataInput dat = ByteStreams.newDataInput(bread);
             String brand = Strings.readUTF(dat);
-            conn.player.brand = brand;
+            conn.player.setBrand(brand);
             System.out.println(channel + " " + brand);
         }
         conn.main.server.events.execute(new PluginMessageReceivedEvent(this));

@@ -17,8 +17,7 @@ public class LoginStart extends BasePacket {
     @Override
     public void process(int len, ByteArrayDataInput in) throws IOException {
         conn.session = Long.toString(ThreadLocalRandom.current().nextLong()).trim();
-        conn.player = new Player(conn);
-        conn.player.username = Strings.readUTF(in);
+        conn.player = new Player(conn, Strings.readUTF(in));
         conn.send(new EncryptionRequest());
     }
 }

@@ -4,22 +4,40 @@ import com.google.common.io.ByteArrayDataOutput;
 import dev.floffah.gamermode.chat.Component;
 import dev.floffah.gamermode.server.packet.play.message.PluginMessage;
 import dev.floffah.gamermode.server.socket.SocketConnection;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public class Player {
-    public Profile profile;
-    public UUID uuid;
-    public String username;
-    public ClientSettings settings;
+    @Getter
+    protected Profile profile;
+    @Getter
+    @Setter
+    protected String brand;
+    @Getter
+    protected SocketConnection conn;
+    @Getter
+    protected UUID uniqueId;
+    @Getter
+    protected String username;
+    /**
+     * The client's settings
+     * -- SETTER --
+     * Update the settings<br/>This setter is for internal protocol only - should not be used and will not work
+     *
+     * @param settings The new client settings
+     * -- GETTER --
+     * Get the client's settings.
+     */
+    @Getter
+    @Setter
+    protected ClientSettings settings;
 
-    public String brand;
-
-    public SocketConnection conn;
-
-    public Player(SocketConnection conn) {
+    public Player(SocketConnection conn, String username) {
         this.conn = conn;
+        this.username = username;
         profile = new Profile(this);
     }
 
