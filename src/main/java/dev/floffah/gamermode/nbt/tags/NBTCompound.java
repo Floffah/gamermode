@@ -2,18 +2,40 @@ package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 public class NBTCompound extends NBTTag {
+    /**
+     * The tag's data
+     * -- GETTER --
+     * Get the tag's data
+     * @return The tags data
+     * -- SETTER --
+     * Set the tag's data
+     * @param data The new data
+     */
+    @Getter
+    @Setter
     public HashMap<String, NBTTag> data = new HashMap<>();
 
+    /**
+     * Construct an NBTCompound
+     */
     public NBTCompound() {
         super(NBTType.COMPOUND);
     }
 
+    /**
+     * Create an NBTCompound from an optionally named compound
+     * @param in Byte array
+     * @param named Whether or not the tag is named
+     * @return The constructed compound
+     */
     @NotNull
     public static NBTCompound fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTCompound compound = new NBTCompound();
@@ -54,6 +76,11 @@ public class NBTCompound extends NBTTag {
         return compound;
     }
 
+    /**
+     * Build an optionally named byte array from the tag
+     * @param out The byte array to write to
+     * @param named Whether or not the tag is named
+     */
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
         if (named) {
@@ -68,13 +95,5 @@ public class NBTCompound extends NBTTag {
         }
 
         out.writeByte(0);
-    }
-
-    public HashMap<String, NBTTag> getData() {
-        return data;
-    }
-
-    public void setData(HashMap<String, NBTTag> data) {
-        this.data = data;
     }
 }

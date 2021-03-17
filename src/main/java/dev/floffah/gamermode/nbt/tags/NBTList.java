@@ -2,6 +2,8 @@ package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,14 +12,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NBTList extends NBTTag {
+    /**
+     * The tag's value
+     * -- GETTER --
+     * Get the tag's value
+     * @return The tags value
+     * -- SETTER --
+     * Set the tag's value
+     * @param value The new value
+     */
+    @Getter
+    @Setter
     public List<NBTTag> value = new ArrayList<>();
+    /**
+     * The tag's value type
+     * -- GETTER --
+     * Get the tag's value type
+     * @return The tags value type
+     * -- SETTER --
+     * Set the tag's value type
+     * @param valtype The new value type
+     */
+    @Getter
+    @Setter
     public NBTType valtype;
+
+    /**
+     * The tag's value length
+     * -- GETTER --
+     * Get the tag's value length
+     * @return The tags value length
+     * -- SETTER --
+     * Set the tag's value length
+     * @param vallen The new value length
+     */
+    @Getter
+    @Setter
     public int vallen = -1;
 
+    /**
+     * Construct an NBTList
+     */
     public NBTList() {
         super(NBTType.LIST);
     }
 
+    /**
+     * Create an NBTByte from an optionally named byte array
+     * @param in Byte array
+     * @param named Whether or not the tag is named
+     * @return The constructed list
+     */
     public static NBTList fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTList nlist = new NBTList();
 
@@ -75,6 +120,11 @@ public class NBTList extends NBTTag {
         return nlist;
     }
 
+    /**
+     * Build an optionally named byte array from the tag
+     * @param out The byte array to write to
+     * @param named Whether or not the tag is named
+     */
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
         if (named) {
@@ -90,13 +140,5 @@ public class NBTList extends NBTTag {
         for (NBTTag tag : this.value) {
             tag.toByteArray(out, false);
         }
-    }
-
-    public int getVallen() {
-        return vallen;
-    }
-
-    public void setValue(List<NBTTag> value) {
-        this.value = value;
     }
 }

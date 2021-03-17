@@ -2,16 +2,38 @@ package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.charset.StandardCharsets;
 
 public class NBTIntArray extends NBTTag {
+    /**
+     * The tag's value
+     * -- GETTER --
+     * Get the tag's value
+     * @return The tags value
+     * -- SETTER --
+     * Set the tag's value
+     * @param value The new value
+     */
+    @Getter
+    @Setter
     public int[] value;
 
+    /**
+     * Construct an NBTIntArray
+     */
     public NBTIntArray() {
         super(NBTType.INT_ARRAY);
     }
 
+    /**
+     * Create an NBTIntArray from an optionally named byte array
+     * @param in Byte array
+     * @param named Whether or not the tag is named
+     * @return The constructed byte
+     */
     public static NBTIntArray fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTIntArray nintarr = new NBTIntArray();
 
@@ -37,6 +59,12 @@ public class NBTIntArray extends NBTTag {
         return nintarr;
     }
 
+
+    /**
+     * Build an optionally named byte array from the tag
+     * @param out The byte array to write to
+     * @param named Whether or not the tag is named
+     */
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
         if (named) {
@@ -50,13 +78,5 @@ public class NBTIntArray extends NBTTag {
         for (int i = 0; i < this.value.length; i++) {
             out.writeInt(this.value[i]);
         }
-    }
-
-    public int[] getValue() {
-        return value;
-    }
-
-    public void setValue(int[] value) {
-        this.value = value;
     }
 }

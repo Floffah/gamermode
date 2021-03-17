@@ -2,28 +2,38 @@ package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.charset.StandardCharsets;
 
 public class NBTString extends NBTTag {
+    /**
+     * The tag's value
+     * -- GETTER --
+     * Get the tag's value
+     * @return The tags value
+     * -- SETTER --
+     * Set the tag's value
+     * @param value The new value
+     */
+    @Getter
+    @Setter
     public String value;
 
+    /**
+     * Construct an NBTString
+     */
     public NBTString() {
         super(NBTType.STRING);
     }
 
-    public static NBTString quick(String name, String value) {
-        NBTString str = new NBTString();
-        str.name = name;
-        str.value = value;
-        return str;
-    }
-
-    public static void compound(NBTCompound c, String name, String value) {
-        NBTString str = quick(name, value);
-        c.data.put(str.name, str);
-    }
-
+    /**
+     * Create an NBTByte from an optionally named byte array
+     * @param in Byte array
+     * @param named Whether or not the tag is named
+     * @return The constructed string
+     */
     public static NBTString fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTString nstr = new NBTString();
 
@@ -48,6 +58,11 @@ public class NBTString extends NBTTag {
         return nstr;
     }
 
+    /**
+     * Build an optionally named byte array from the tag
+     * @param out The byte array to write to
+     * @param named Whether or not the tag is named
+     */
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
         if (named) {
@@ -62,13 +77,5 @@ public class NBTString extends NBTTag {
         for (byte b : bs) {
             out.writeByte(b);
         }
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 }

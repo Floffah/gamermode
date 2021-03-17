@@ -2,10 +2,18 @@ package dev.floffah.gamermode.nbt.util;
 
 import dev.floffah.gamermode.nbt.NBTObject;
 
+/**
+ * The main NBT builder class that should be the entrypoint for building NBT
+ */
 public class NBTBuilder {
     NBTObject obj;
     NBTCompoundBuilder root;
 
+    /**
+     * Start an NBTCompound and automatically create a root compound with the name
+     * @param name The name to initialise with
+     * @return The NBTCompoundBuilder made
+     */
     public static NBTCompoundBuilder start(String name) {
         NBTBuilder builder = new NBTBuilder();
         return builder.startRoot(name);
@@ -25,6 +33,10 @@ public class NBTBuilder {
         return root;
     }
 
+    /**
+     * Build the NBTBuilder to a NBTObject
+     * @return The NBTObject built
+     */
     public NBTObject build() {
         obj = new NBTObject();
         obj.setRoot(root.cmp);

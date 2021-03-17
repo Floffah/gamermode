@@ -1,5 +1,8 @@
 package dev.floffah.gamermode.nbt.cereal;
 
+/**
+ * Currently not used
+ */
 public class Deserializer {
 //    public Object fromBytes(ByteArrayDataInput in, Class<?> type, boolean gzipped) throws IOException, NoSuchMethodException {
 //        NBTObject nbt = new NBTObject();

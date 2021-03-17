@@ -2,16 +2,38 @@ package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.charset.StandardCharsets;
 
 public class NBTShort extends NBTTag {
+    /**
+     * The tag's value
+     * -- GETTER --
+     * Get the tag's value
+     * @return The tags value
+     * -- SETTER --
+     * Set the tag's value
+     * @param value The new value
+     */
+    @Getter
+    @Setter
     public short value;
 
+    /**
+     * Construct an NBTShort
+     */
     public NBTShort() {
         super(NBTType.SHORT);
     }
 
+    /**
+     * Create an NBTShort from an optionally named byte array
+     * @param in Byte array
+     * @param named Whether or not the tag is named
+     * @return The constructed byte
+     */
     public static NBTShort fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTShort nshort = new NBTShort();
 
@@ -30,6 +52,11 @@ public class NBTShort extends NBTTag {
         return nshort;
     }
 
+    /**
+     * Build an optionally named byte array from the tag
+     * @param out The byte array to write to
+     * @param named Whether or not the tag is named
+     */
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
         if (named) {
@@ -38,13 +65,5 @@ public class NBTShort extends NBTTag {
             out.write(b);
         }
         out.writeShort(value);
-    }
-
-    public short getValue() {
-        return value;
-    }
-
-    public void setValue(short value) {
-        this.value = value;
     }
 }

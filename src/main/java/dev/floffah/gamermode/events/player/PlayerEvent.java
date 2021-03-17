@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * An event class that should be extended upon in playe related events
+ * An event class that should be extended upon in player related events
  */
 public class PlayerEvent extends Cancellable {
     /**

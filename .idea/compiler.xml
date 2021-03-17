@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/target/lombok-sources/delombok" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/target/lombok-sources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/target/lombok-test-sources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/target/lombok-test-sources/delombok" includeSubdirectories="true" />
+    </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">

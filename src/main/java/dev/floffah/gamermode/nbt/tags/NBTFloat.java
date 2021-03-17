@@ -2,28 +2,38 @@ package dev.floffah.gamermode.nbt.tags;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.charset.StandardCharsets;
 
 public class NBTFloat extends NBTTag {
+    /**
+     * The tag's value
+     * -- GETTER --
+     * Get the tag's value
+     * @return The tags value
+     * -- SETTER --
+     * Set the tag's value
+     * @param value The new value
+     */
+    @Getter
+    @Setter
     public float value;
 
+    /**
+     * Construct an NBTFloat
+     */
     public NBTFloat() {
         super(NBTType.FLOAT);
     }
 
-    public static NBTFloat quick(String name, float value) {
-        NBTFloat i = new NBTFloat();
-        i.name = name;
-        i.value = value;
-        return i;
-    }
-
-    public static void compound(NBTCompound c, String name, float value) {
-        NBTFloat str = quick(name, value);
-        c.data.put(str.name, str);
-    }
-
+    /**
+     * Create an NBTFloat from an optionally named byte array
+     * @param in Byte array
+     * @param named Whether or not the tag is named
+     * @return The constructed byte
+     */
     public static NBTFloat fromByteArray(ByteArrayDataInput in, boolean named) {
         NBTFloat nfloat = new NBTFloat();
 
@@ -42,6 +52,11 @@ public class NBTFloat extends NBTTag {
         return nfloat;
     }
 
+    /**
+     * Build an optionally named byte array from the tag
+     * @param out The byte array to write to
+     * @param named Whether or not the tag is named
+     */
     @Override
     public void toByteArray(ByteArrayDataOutput out, boolean named) {
         if (named) {
@@ -50,13 +65,5 @@ public class NBTFloat extends NBTTag {
             out.write(b);
         }
         out.writeFloat(this.value);
-    }
-
-    public float getValue() {
-        return value;
-    }
-
-    public void setValue(float value) {
-        this.value = value;
     }
 }
