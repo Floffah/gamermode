@@ -21,7 +21,7 @@ public class ChatColors {
     }
 
     /**
-     * Same as legacyAmbersand except you pass a character to replace with the color char
+     * Same as {@link dev.floffah.gamermode.chat.ChatColors#legacyAmbersand(String)} except you pass a character to replace with the color char
      * @param replacer Character to replace with the color char
      * @param message Message to replace in
      * @return New message with color chars
@@ -31,7 +31,7 @@ public class ChatColors {
     }
 
     /**
-     * Same as legacyAny except replaces it with the unicode name for the color char (used for motds)
+     * Same as {@link dev.floffah.gamermode.chat.ChatColors#legacyAny(char, String)} except replaces it with the unicode name for the color char (used for motds)
      * @param replacer Character to replace with the unicode color char
      * @param message Message to replace in
      * @return New message with unicode color char
@@ -92,7 +92,7 @@ public class ChatColors {
     }
 
     /**
-     * Same as translateLegacy(java.lang.String, java.lang.Character)
+     * Same as {@link dev.floffah.gamermode.chat.ChatColors#translateLegacy(String, char)} )}
      * @param message Message to parse
      * @return Constructed Component
      */

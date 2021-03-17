@@ -3,6 +3,9 @@ package dev.floffah.gamermode.events.network;
 import com.google.common.io.ByteArrayDataOutput;
 import dev.floffah.gamermode.server.packet.BasePacket;
 
+/**
+ * An event fired right after a packet is sent
+ */
 public class PacketSentEvent extends PacketEvent {
     /**
      * A normal packet event (that is not cancellable) for listening for when a packet is being sent

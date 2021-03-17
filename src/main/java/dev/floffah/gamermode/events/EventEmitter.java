@@ -9,15 +9,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class for handling listener classes and executing events
+ */
 public class EventEmitter {
     Server server;
 
     Map<Class<? extends Event>, List<Executor>> lnrs = new HashMap<>();
 
+    /**
+     * Construct an EventEmitter
+     * @param server The main server class
+     */
     public EventEmitter(Server server) {
         this.server = server;
     }
 
+    /**
+     * Execute a specific event and call all listeners listening to it
+     * @param e The event to execute
+     */
     public void execute(Event e) {
         if (lnrs.containsKey(e.getClass())) {
             List<Executor> ex = lnrs.get(e.getClass());
@@ -27,6 +38,10 @@ public class EventEmitter {
         }
     }
 
+    /**
+     * Register all EventListeners in a class
+     * @param l The class to register from
+     */
     public void registerListeners(Listener l) {
         Method[] methods = l.getClass().getMethods();
         for (Method m : methods) {

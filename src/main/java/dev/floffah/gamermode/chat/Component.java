@@ -21,84 +21,65 @@ public class Component {
      * The text of the current component
      * -- GETTER --
      * Get the current component's text
-     * -- SETTER --
-     * Set the component's text
+     *
+     * @return The current component's text
      */
     @Getter
-    @Setter
     String text;
     /**
      * The current component's color
      * -- GETTER --
      * Get the current component's color
-     * -- SETTER --
-     * Set the component's color
      *
-     * @param color The color to set
+     * @return The current component's color
      */
     @Getter
-    @Setter
     ChatColor color;
 
     /**
      * Whether or not the component is obfuscated
      * -- GETTER --
      * Get whether or not the component is obfuscated
-     * -- SETTER --
-     * Set the component's obfuscation state
      *
-     * @param obfuscated Obfuscation state
+     * @return The obfuscation state
      */
     @Getter
-    @Setter
     boolean obfuscated;
     /**
      * Whether or not the component is bold
      * -- GETTER --
      * Get whether or not the component is bold
-     * -- SETTER --
-     * Set the component's bold state
      *
-     * @param bold Bold state
+     * @return Whether or not the component is bold
      */
     @Getter
-    @Setter
     boolean bold;
     /**
      * Whether or not the component has a strike through it
      * -- GETTER --
      * Get whether or not the component has a strike through it
-     * -- SETTER --
-     * Set the component's strikethrough state
      *
-     * @param strikethrough Strikethrough state
+     * @return Whether or not the component has a strike through it
      */
     @Getter
-    @Setter
     boolean strikethrough;
     /**
      * Whether or not the component is underlined
      * -- GETTER --
      * Get whether or not the component is underlined
-     * -- SETTER --
-     * Set the component's underline state
      *
-     * @param underlined Underline state
+     * @return Whether or not the component is underlined
      */
     @Getter
-    @Setter
     boolean underlined;
     /**
      * Whether or not the component is italic
      * -- GETTER --
      * Get whether or not the component is italic
-     * -- SETTER --
-     * Set the component's italic state
      *
-     * @param italic Italics state
+     * @return Whether or not the component is italic
      */
     @Getter
-    @Setter
     boolean italic;
 
     /**

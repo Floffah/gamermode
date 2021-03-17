@@ -99,6 +99,8 @@ public enum ChatColor {
      * Color/format name
      * -- GETTER --
      * Get the color/format's name
+     *
+     * @return The color/format's name
      */
     @Getter
     String name;
@@ -106,6 +108,8 @@ public enum ChatColor {
      * Color/format code
      * -- GETTER --
      * Get the color/format's code
+     *
+     * @return The color/format's code
      */
     @Getter
     String code;
@@ -113,6 +117,8 @@ public enum ChatColor {
      * Color hex code
      * -- GETTER --
      * Get the color's hex code
+     *
+     * @return The color/format's hex code
      */
     @Getter
     String hex;
@@ -120,6 +126,8 @@ public enum ChatColor {
      * Color/format's byte value
      * -- GETTER --
      * Get the color/format's byte value
+     *
+     * @return The color/format's byte value
      */
     @Getter
     int cint;
