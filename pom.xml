@@ -14,7 +14,7 @@
         <maven.compiler.release>15</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <lombok.version>1.18.18</lombok.version>
+        <lombok.version>1.18.20.0.0</lombok.version>
         <junit.version>5.8.0-M1</junit.version>
         <jackson.version>2.12.2</jackson.version>
     </properties>
@@ -32,7 +32,7 @@
             <plugin>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok-maven-plugin</artifactId>
-                <version>${lombok.version}.0</version>
+                <version>${lombok.version}</version>
                 <executions>
                     <execution>
                         <id>delombok</id>
