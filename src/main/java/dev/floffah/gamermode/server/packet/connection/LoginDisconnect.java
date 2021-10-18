@@ -9,9 +9,19 @@ import dev.floffah.gamermode.util.Strings;
 
 import java.io.IOException;
 
+/**
+ * Outgoing login packet for disconnecting the user
+ */
 public class LoginDisconnect extends BasePacket {
+    /**
+     * Reason for the disconnect
+     */
     Component chat;
 
+    /**
+     * Construct a LoginDisconnect packet with a reason component
+     * @param chat The reason
+     */
     public LoginDisconnect(Component chat) {
         super("LoginDisconnect", 0x00, PacketType.OUTBOUND);
         this.chat = chat;

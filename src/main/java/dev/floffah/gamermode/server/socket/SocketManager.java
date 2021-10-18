@@ -12,15 +12,15 @@ public class SocketManager {
     public Map<UUID, SocketConnection> verified = new HashMap<>();
     public List<SocketConnection> newconns = new LinkedList<>();
     public ServerSocket sock;
-    int port = 25565;
 
     public SocketManager(Server server) {
         this.server = server;
     }
 
     public void start() throws IOException {
-        sock = new ServerSocket(port);
+        sock = new ServerSocket(server.conf.info.port);
         listen();
+        server.logger.info("Listening on " + sock.getLocalSocketAddress().toString());
     }
 
     public void listen() {

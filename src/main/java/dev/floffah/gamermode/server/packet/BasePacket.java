@@ -19,13 +19,29 @@ public class BasePacket {
         this.type = type;
     }
 
+    /**
+     * Process the packet
+     * @param len Packet length
+     * @param in Byte array
+     * @throws IOException Any exception thrown
+     */
     public void process(int len, ByteArrayDataInput in) throws IOException {
     }
 
+    /**
+     * Packet's built outgoing byte array
+     * @return
+     * @throws IOException
+     */
     public ByteArrayDataOutput buildOutput() throws IOException {
         return null;
     }
 
+    /**
+     * Executed after the packet is sent
+     * @param e The sent event
+     * @throws IOException Any exception thrown
+     */
     public void postSend(PacketSentEvent e) throws IOException {
 
     }

@@ -57,6 +57,10 @@ public class Config {
          * 3 - hard<br/>
          */
         public byte difficulty = 1;
+        /**
+         * Server port to listen on
+         */
+        public int port = 25565;
     }
 
     /**

@@ -1,5 +1,6 @@
 package dev.floffah.gamermode.player;
 
+import lombok.Getter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,16 +14,36 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class Profile {
+    /**
+     * Name to uuid
+     */
     public static String NameConvertURL = "https://api.mojang.com/profiles/minecraft";
+    /**
+     * Profiles
+     */
     public static String ProfileURL = "https://sessionserver.mojang.com/session/minecraft/profile";
 
-
+    /**
+     * The player
+     * -- GETTER --
+     * Get the player
+     * @return The player
+     */
+    @Getter
     Player player;
 
+    /**
+     * Construct a profile
+     * @param player The associated player
+     */
     public Profile(Player player) {
         this.player = player;
     }
 
+    /**
+     * Authentication process
+     * @throws IOException Any exception thrown during authentication
+     */
     public void authenticate() throws IOException {
         // todo: implement some kind of temporary caching for these values
         JSONArray id = requestUUID(player.username);
@@ -39,6 +60,12 @@ public class Profile {
         }
     }
 
+    /**
+     * Get the user's info
+     * @param uuid UUID
+     * @return Info from the UUID
+     * @throws IOException Any exception thrown when getting the player info
+     */
     public JSONObject getInfo(UUID uuid) throws IOException {
         System.out.println(ProfileURL + "/" + uuid.toString());
         URL url = new URL(ProfileURL + "/" + uuid.toString());
@@ -51,6 +78,12 @@ public class Profile {
         return new JSONObject(content);
     }
 
+    /**
+     * Gets the uuid from the supplied username
+     * @param username Username to request
+     * @return UUIDs
+     * @throws IOException Any exceptions thrown when requesting the uuid
+     */
     public JSONArray requestUUID(String username) throws IOException {
         URL url = new URL(NameConvertURL);
 
@@ -69,6 +102,12 @@ public class Profile {
         return new JSONArray(readHttpConString(con));
     }
 
+    /**
+     * Builds a string from a http url connection
+     * @param con The connection
+     * @return String built
+     * @throws IOException And exception thrown along the way
+     */
     public String readHttpConString(HttpURLConnection con) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         StringBuilder content = new StringBuilder();

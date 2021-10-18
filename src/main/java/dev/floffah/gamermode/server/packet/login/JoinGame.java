@@ -17,7 +17,13 @@ import dev.floffah.gamermode.world.World;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Outgoing play packet for joining the player
+ */
 public class JoinGame extends BasePacket {
+    /**
+     * Construct a JoinGame packet
+     */
     public JoinGame() {
         super("JoinGame", 0x24, PacketType.OUTBOUND);
     }
@@ -50,8 +56,10 @@ public class JoinGame extends BasePacket {
 
     @Override
     public void postSend(PacketSentEvent e) throws IOException {
+        // event stuff
         PlayerJoinEvent joine = new PlayerJoinEvent(conn.player);
         conn.main.server.events.execute(joine);
+        // kick if cancelled
         if (joine.isCancelled()) {
             String reason = "Kicked";
             if (joine.getCancelReason() != null) {
@@ -61,6 +69,7 @@ public class JoinGame extends BasePacket {
             return;
         }
 
+        // start keepalive
         conn.main.server.scheduler.scheduleAtFixedRate(() -> {
             try {
                 conn.send(new Keepalive(0));
@@ -69,10 +78,11 @@ public class JoinGame extends BasePacket {
             }
         }, 0, 1, TimeUnit.SECONDS);
 
+        // send brand
         ByteArrayDataOutput brandout = ByteStreams.newDataOutput();
         Strings.writeUTF("gamermode", brandout);
-        //brandout.writeUTF("gamermode");
         conn.player.sendPluginMessage("minecraft:brand", brandout);
+        // send the next packets
         conn.send(new ServerDifficulty());
         conn.send(new PlayerAbillities());
     }

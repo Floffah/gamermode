@@ -22,8 +22,8 @@ public class OpenWindow extends BasePacket {
     public ByteArrayDataOutput buildOutput() throws IOException {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        VarInt.writeVarInt(out, inv.invId);
-        VarInt.writeVarInt(out, inv.type.ordinal());
+        VarInt.writeVarInt(out, inv.getInvId());
+        VarInt.writeVarInt(out, inv.getType().ordinal());
         Strings.writeUTF("", out);
 
         return out;

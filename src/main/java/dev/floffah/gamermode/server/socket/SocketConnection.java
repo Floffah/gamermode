@@ -19,6 +19,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -184,7 +185,11 @@ public class SocketConnection {
             prc.write(dat.toByteArray());
             byte[] sent = prc.toByteArray();
             out.write(sent);
-            out.flush();
+            try {
+                out.flush();
+            } catch (SocketException e) {
+                if(e.getMessage().toLowerCase().contains(""))
+            }
 
             main.server.logger.info(String.format("%sSent packet of name %s and id %s of length %s", dbgp, p.name, p.id, sent.length), Arrays.toString(sent));
             PacketSentEvent sente = new PacketSentEvent(p, prc);

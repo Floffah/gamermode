@@ -19,27 +19,37 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+/**
+ * Incoming login packet for processing the client's encryption response
+ */
 public class EncryptionResponse extends BasePacket {
+    /**
+     * Construct an EncryptionResponse
+     */
     public EncryptionResponse() {
         super("LoginEncryptionResponse", 0x01, PacketType.INBOUND);
     }
 
     @Override
     public void process(int len, ByteArrayDataInput in) throws IOException {
+        // temporary cipher
         Cipher tempc;
 
+        // read the shared secret
         int sslen = VarInt.readVarInt(in);
         byte[] ss = new byte[sslen];
         for (int i = 0; i < sslen; i++) {
             ss[i] = in.readByte();
         }
 
+        // received verify token
         int vtlen = VarInt.readVarInt(in);
         byte[] vt = new byte[vtlen];
         for (int i = 0; i < vtlen; i++) {
             vt[i] = in.readByte();
         }
 
+        // create temporary cipher
         try {
             tempc = Cipher.getInstance("RSA");
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
@@ -58,6 +68,7 @@ public class EncryptionResponse extends BasePacket {
             return;
         }
 
+        // decrypt verification token
         byte[] clientverify;
         try {
             tempc.init(Cipher.DECRYPT_MODE, conn.kp.getPrivate());
@@ -68,11 +79,13 @@ public class EncryptionResponse extends BasePacket {
             return;
         }
 
+        // make sure its the same as the server sent
         if (!Arrays.equals(conn.verifytoken, clientverify)) {
             conn.disconnect("&cInvalid verify token");
             return;
         }
 
+        // initialise the cipher used for the rest of the communication
         try {
             conn.eciph = Cipher.getInstance("AES/CFB8/NoPadding");
             conn.eciph.init(Cipher.ENCRYPT_MODE, conn.secret, new IvParameterSpec(conn.secret.getEncoded()));
@@ -84,6 +97,7 @@ public class EncryptionResponse extends BasePacket {
             return;
         }
 
+        // hash the secret, random session code, and public key
         try {
             conn.digest = MessageDigest.getInstance("SHA-1");
             conn.digest.update(conn.session.getBytes());
@@ -95,16 +109,20 @@ public class EncryptionResponse extends BasePacket {
             conn.disconnect("&cError while creating hash");
             return;
         }
+
+        // encode the clients address
         InetAddress addr = conn.main.sock.getInetAddress();
         conn.prox = URLEncoder.encode(addr.getHostAddress(), StandardCharsets.UTF_8);
 
+        // enable encryption
         conn.encrypted = true;
-
         conn.fin.enableDecryption(conn.dciph);
         conn.fout.enableEncryption(conn.eciph);
 
+        // initialise keepalive
         conn.lastkeepalivereceive = System.currentTimeMillis();
 
+        // send next packets
         conn.send(new LoginSuccess());
         conn.send(new JoinGame());
     }

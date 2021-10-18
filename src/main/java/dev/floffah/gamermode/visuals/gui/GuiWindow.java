@@ -45,7 +45,7 @@ public class GuiWindow {
     }
 
     public void startOutput() throws IOException {
-        frame = new JFrame("GamerMode Output");
+        this.frame = new JFrame("GamerMode Output");
 
         text = new JTextArea();
         text.setEditable(false);

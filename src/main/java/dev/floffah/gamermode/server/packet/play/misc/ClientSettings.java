@@ -4,15 +4,20 @@ import com.google.common.io.ByteArrayDataInput;
 import dev.floffah.gamermode.player.Player;
 import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
-import dev.floffah.gamermode.util.Bytes;
 import dev.floffah.gamermode.util.Strings;
 import dev.floffah.gamermode.util.VarInt;
 
 import java.io.IOException;
 
+/**
+ * Incoming play packet the client uses to tell the server its settings
+ */
 public class ClientSettings extends BasePacket {
+    /**
+     * Construct a client settings packet
+     */
     public ClientSettings() {
-        super("ClientSettings", 0x05, PacketType.OUTBOUND);
+        super("ClientSettings", 0x05, PacketType.INBOUND);
     }
 
     @Override

@@ -9,11 +9,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Server cache<br/>
+ * Currently isn't used
+ */
 public class CacheProvider {
+    /**
+     * The directory containing cache
+     */
     public File cachedir;
+    /**
+     * The server
+     */
     Server server;
+    /**
+     * Cache info
+     */
     JSONObject inf;
 
+    /**
+     * Construct a cacheprovider
+     * @param server The server
+     */
     public CacheProvider(Server server) {
         this.server = server;
 
@@ -35,6 +52,10 @@ public class CacheProvider {
         }
     }
 
+    /**
+     * Validate the cache and purge old cached data
+     * @throws IOException Any exceptions thrown along the way
+     */
     public void validate() throws IOException {
         if (!inf.has("lastPlayerPurge") || inf.getLong("lastPlayerPurge") < (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))) {
             File entriesdir = Path.of(cachedir.getPath(), "ids").toFile();

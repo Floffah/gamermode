@@ -10,7 +10,13 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+/**
+ * Outgoing login packet for requesting encryption
+ */
 public class EncryptionRequest extends BasePacket {
+    /**
+     * Construct an EncryptionRequest
+     */
     public EncryptionRequest() {
         super("LoginEncryptionRequest", 0x01, PacketType.OUTBOUND);
     }
@@ -20,6 +26,7 @@ public class EncryptionRequest extends BasePacket {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         VarInt.writeVarInt(out, 0);
         try {
+            // generate & write a keypair
             conn.kp = conn.main.server.kpg.generateKeyPair();
             byte[] e = conn.kp.getPublic().getEncoded();
             VarInt.writeVarInt(out, e.length);
@@ -27,6 +34,7 @@ public class EncryptionRequest extends BasePacket {
                 out.writeByte(b);
             }
 
+            // generate & write a verification token
             conn.verifytoken = new byte[5];
             SecureRandom.getInstanceStrong().nextBytes(conn.verifytoken);
 

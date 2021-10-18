@@ -9,7 +9,13 @@ import dev.floffah.gamermode.util.Strings;
 import java.io.IOException;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Incoming packet that the client uses to start the login process
+ */
 public class LoginStart extends BasePacket {
+    /**
+     * Construct a LoginStart packet
+     */
     public LoginStart() {
         super("LoginStart", 0x00, PacketType.INBOUND);
     }

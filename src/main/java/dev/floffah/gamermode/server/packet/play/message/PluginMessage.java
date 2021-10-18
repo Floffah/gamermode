@@ -8,21 +8,31 @@ import dev.floffah.gamermode.server.packet.BasePacket;
 import dev.floffah.gamermode.server.packet.PacketType;
 import dev.floffah.gamermode.util.Strings;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Incoming & outgoing play packet for telling either end some simple information (e.g. brand)
+ */
 public class PluginMessage extends BasePacket {
     public ByteArrayDataOutput bytes;
     public byte[] bytesread;
     public String channel;
 
+    /**
+     * Construct an outgoing plugin message packet
+     * @param channel Message channel
+     * @param bytes Byte array
+     */
     public PluginMessage(String channel, ByteArrayDataOutput bytes) {
         super("PluginMessageOut", 0x17, PacketType.OUTBOUND);
         this.channel = channel;
         this.bytes = bytes;
     }
 
+    /**
+     * Construct an incoming plugin message packet
+     */
     public PluginMessage() {
         super("PluginMessageIn", 0x0B, PacketType.INBOUND);
     }

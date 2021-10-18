@@ -9,11 +9,24 @@ import dev.floffah.gamermode.server.packet.PacketType;
 
 import java.io.IOException;
 
+/**
+ * Incoming & outgoing play packet-<br/>
+ * The outgoing packet is sent to request a keepalive packet from the client to ensure
+ * it is still connected and working<br/>
+ * The incoming packet is received in response to the outgoing keepalive packet
+ */
 public class Keepalive extends BasePacket {
+    /**
+     * Construct an outgoing keepalive packet
+     * @param confirm Set this to anything, just to make sure its an outgoing packet
+     */
     public Keepalive(int confirm) {
         super("KeepAliveOut", 0x1F, PacketType.OUTBOUND);
     }
 
+    /**
+     * Construct an incoming keepalive packet
+     */
     public Keepalive() {
         super("KeepAliveIn", 0x10, PacketType.INBOUND);
     }

@@ -7,7 +7,13 @@ import dev.floffah.gamermode.server.packet.PacketType;
 
 import java.io.IOException;
 
+/**
+ * Outgoing play packet for telling the client the server's difficulty
+ */
 public class ServerDifficulty extends BasePacket {
+    /**
+     * Constructing a server difficulty packet
+     */
     public ServerDifficulty() {
         super("ServerDifficulty", 0x0D, PacketType.OUTBOUND);
     }

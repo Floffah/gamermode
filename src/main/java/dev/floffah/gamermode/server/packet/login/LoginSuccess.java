@@ -9,7 +9,13 @@ import dev.floffah.gamermode.util.Strings;
 
 import java.io.IOException;
 
+/**
+ * Outgoing login packet for notifying the client that the login was a success
+ */
 public class LoginSuccess extends BasePacket {
+    /**
+     * Construct a LoginSuccess packet
+     */
     public LoginSuccess() {
         super("LoginSuccess", 0x02, PacketType.OUTBOUND);
     }

@@ -7,7 +7,13 @@ import dev.floffah.gamermode.server.packet.PacketType;
 
 import java.io.IOException;
 
+/**
+ * Outgoing play packet for telling the client the player's creative abilities
+ */
 public class PlayerAbillities extends BasePacket {
+    /**
+     * Construct a player abilities packet
+     */
     public PlayerAbillities() {
         super("PlayerAbillities", 0x30, PacketType.OUTBOUND);
     }
